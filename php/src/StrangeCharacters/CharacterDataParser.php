@@ -117,45 +117,64 @@ class CharacterDataParser
     }
 
     /**
-     * @param mixed $characterData
-     * @param mixed $result
+     * @param stdClass $characterData
+     * @param array $characters
      * @return void
      */
-    protected static function addNemesisAndFamilyToCharacters(mixed $characterData, mixed $result): void
+    protected static function addNemesisAndFamilyToCharacters(stdClass $characterData, array $characters): void
     {
-        $character = self::addNemesis($characterData, $result);
-        self::addFamily($characterData, $result);
-
+        self::addNemesis($characterData, $characters);
+        self::addFamily($characterData, $characters);
     }
 
     /**
      * @param stdClass $characterData
-     * @param array $result
+     * @param array $characters
      * @return void
      */
-    protected static function addNemesis(stdClass $characterData, array $result): void
+    protected static function addNemesis(stdClass $characterData, array $characters): void
     {
         if (!empty($characterData->Nemesis)) {
-            $character = self::findCharacter($characterData->FirstName, $result);
-            $character->setNemesis(self::findCharacter($characterData->Nemesis, $result));
+            $character = self::findCharacter($characterData->FirstName, $characters);
+            $character->setNemesis(self::findCharacter($characterData->Nemesis, $characters));
         }
     }
 
     /**
-     * @param mixed $characterData
-     * @param mixed $result
+     * @param stdClass $characterData
+     * @param array $characters
      * @return void
      */
-    protected static function addFamily(mixed $characterData, mixed $result): void
+    protected static function addFamily(stdClass $characterData, array $characters): void
     {
-// add family
         if (!empty($characterData->Children)) {
-            $character = self::findCharacter($characterData->FirstName, $result);
-            foreach ($characterData->Children as $childName) {
-                $child = self::findCharacter($childName, $result);
-                if ($child != null)
-                    $character->addChild($child);
-            }
+            self::addChildren(self::findCharacter($characterData->FirstName, $characters), $characterData, $characters);
         }
+    }
+
+    /**
+     * @param Character $character
+     * @param stdClass $characterData
+     * @param array $characters
+     * @return void
+     */
+    protected static function addChildren(Character $character, stdClass $characterData, array $characters): void
+    {
+        foreach ($characterData->Children as $childName) {
+            self::addChild($character, $childName, $characters);
+        }
+    }
+
+    /**
+     * @param Character $character
+     * @param string $childName
+     * @param array $characters
+     * @return void
+     */
+    protected static function addChild(Character $character, string $childName, array $characters): void
+    {
+        $child = self::findCharacter($childName, $characters);
+        if ($child != null)
+            $character->addChild($child);
     }
 }
