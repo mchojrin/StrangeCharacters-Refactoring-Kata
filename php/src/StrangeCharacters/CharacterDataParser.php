@@ -51,8 +51,7 @@ class CharacterDataParser
                     $hasFamilyName = true;
                 }
 
-                $familyName = $familyLocalNameList[0];
-                $localName = $familyLocalNameList[1];
+                [$familyName, $localName] = $familyLocalNameList;
             } else if (count($familyLocalNameList) == 1) {
                 $localName = $familyLocalNameList[0];
             }
@@ -61,16 +60,9 @@ class CharacterDataParser
                 $characterName = $localName;
             }
 
-            $localNameWithoutCurlyBraces = preg_replace("|\{[^{]*?}|", "", $localName);
-            $pattern = "|(.*)\{([^{]*)}|";
-            $matches = [];
-            preg_match($pattern, $localName, $matches);
-            if (count($matches) > 0) {
-                $curlyBraces = $matches[2];
-                $characterName = $matches[1];
-            }
+            list($curlyBraces, $characterName) = self::extracted($localName, $curlyBraces, $characterName);
 
-            $tempPathWithoutCurlyBraces = "/" . $localNameWithoutCurlyBraces . $tempPathWithoutCurlyBraces;
+            $tempPathWithoutCurlyBraces = "/" . self::getLocalNameWithoutCurlyBraces($localName) . $tempPathWithoutCurlyBraces;
         }
 
         if (!$hasFamilyName) {
@@ -186,5 +178,32 @@ class CharacterDataParser
     protected static function getAllCharactersDataFrom(string $filename): mixed
     {
         return json_decode(file_get_contents($filename), false);
+    }
+
+    /**
+     * @param string $pattern
+     * @param string $localName
+     * @param mixed $curlyBraces
+     * @param mixed $characterName
+     * @return array
+     */
+    protected static function extracted(string $localName, mixed $curlyBraces, mixed $characterName): array
+    {
+        $matches = [];
+        preg_match("|(.*)\{([^{]*)}|", $localName, $matches);
+        if (count($matches) > 0) {
+            $curlyBraces = $matches[2];
+            $characterName = $matches[1];
+        }
+        return [$curlyBraces, $characterName];
+    }
+
+    /**
+     * @param string $localName
+     * @return array|string|string[]|null
+     */
+    protected static function getLocalNameWithoutCurlyBraces(string $localName): string|array|null
+    {
+        return preg_replace("|\{[^{]*?}|", "", $localName);
     }
 }
