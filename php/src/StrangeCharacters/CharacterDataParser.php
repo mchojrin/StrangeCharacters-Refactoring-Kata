@@ -76,8 +76,8 @@ class CharacterDataParser
             $names = array_filter(explode("/", $tempPathWithoutCurlyBraces));
             if (count($names) == 2) {
                 $firstName = next($names);
-                $candidates = array_filter($familyMembers, fn(Character $c) => ($c->firstName == $firstName));
-                $character = !empty($candidates) ? current($candidates) : null;
+                $relativesNamedFirstName = self::findRelativesNamed($firstName, $familyMembers);
+                $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
             }
             if ($character != null && $curlyBraces == "Nemesis") {
 
@@ -205,5 +205,15 @@ class CharacterDataParser
     protected static function getLocalNameWithoutCurlyBraces(string $localName): string|array|null
     {
         return preg_replace("|\{[^{]*?}|", "", $localName);
+    }
+
+    /**
+     * @param string $firstName
+     * @param array $familyMembers
+     * @return array
+     */
+    protected static function findRelativesNamed(string $firstName, array $familyMembers): array
+    {
+        return array_filter($familyMembers, fn(Character $c) => ($c->firstName == $firstName));
     }
 }
