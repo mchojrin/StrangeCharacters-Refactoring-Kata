@@ -12,41 +12,41 @@ class CharacterDataParserTest extends TestCase
     public function findCharacterByPath(): void
     {
         CharacterDataParser::initWithDataFrom(null);
-        self::assertEquals("Eleven", CharacterDataParser::evaluatePath("/Jim/Eleven")->firstName);
+        self::assertEquals("Eleven", CharacterDataParser::findCharacterByPath("/Jim/Eleven")->firstName);
     }
 
     #[Test]
     public function findCharacterByEmptyPath(): void
     {
         CharacterDataParser::initWithDataFrom(null);
-        self::assertNull(CharacterDataParser::evaluatePath(""));
+        self::assertNull(CharacterDataParser::findCharacterByPath(""));
     }
 
     #[Test]
     public function FindCharacterByPathWithFamilyName(): void
     {
         CharacterDataParser::initWithDataFrom(null);
-        self::assertEquals("Nancy", CharacterDataParser::evaluatePath("/Wheeler:Karen/Wheeler:Nancy")->firstName);
+        self::assertEquals("Nancy", CharacterDataParser::findCharacterByPath("/Wheeler:Karen/Wheeler:Nancy")->firstName);
     }
 
     #[Test]
     public function FindNemesisByPath(): void
     {
         CharacterDataParser::initWithDataFrom(null);
-        self::assertEquals("Mindflayer", CharacterDataParser::evaluatePath("/Joyce/Will{Nemesis}")->firstName);
+        self::assertEquals("Mindflayer", CharacterDataParser::findCharacterByPath("/Joyce/Will{Nemesis}")->firstName);
     }
 
     #[Test]
     public function FindNemesisByPathAndFamilyName(): void
     {
         CharacterDataParser::initWithDataFrom(null);
-        self::assertNull(CharacterDataParser::evaluatePath("/Wheeler:Karen/Wheeler:Nancy{Nemesis}"));
+        self::assertNull(CharacterDataParser::findCharacterByPath("/Wheeler:Karen/Wheeler:Nancy{Nemesis}"));
     }
 
     #[Test]
     public function FindNothingByPathAndFamilyName(): void
     {
         CharacterDataParser::initWithDataFrom(null);
-        self::assertNull(CharacterDataParser::evaluatePath("/Wheeler:Karen/Wheeler:George"));
+        self::assertNull(CharacterDataParser::findCharacterByPath("/Wheeler:Karen/Wheeler:George"));
     }
 }

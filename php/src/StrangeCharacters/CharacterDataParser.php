@@ -20,23 +20,7 @@ class CharacterDataParser
         self::$characterFinder = new CharacterFinder(self::$allCharacters);
     }
 
-    private static function createCompleteCharactersFrom(array $allCharactersData): array
-    {
-        $allCharacters = self::buildCharactersFrom($allCharactersData);
-
-        self::completeCharacters($allCharactersData, $allCharacters);
-
-        return $allCharacters;
-    }
-
-    private static function findCharacter(string $name, array $result): ?Character
-    {
-        return current(array_filter($result, function (Character $character) use ($name) {
-            return $character->firstName === $name;
-        }));
-    }
-
-    public static function evaluatePath(string $path): ?Character
+    public static function findCharacterByPath(string $path): ?Character
     {
         $hasFamilyName = false;
         $characterName = "";
@@ -45,13 +29,13 @@ class CharacterDataParser
         $persons = self::getPersonsFrom($path);
 
         for ($i = count($persons) - 1; $i >= 0; $i--) {
-            [$familyName, $localName] = self::separateNames($persons[$i]);
+            [$familyName, $firstName] = self::separateNames($persons[$i]);
 
-            $hasFamilyName = !empty($familyName);
+            $hasFamilyName = $hasFamilyName || !empty($familyName);
 
             if ($i == count($persons) - 1) {
-                $modifier = self::getModifierFrom($localName);
-                $characterName = self::removeModifierFrom($localName);
+                $modifier = self::getModifierFrom($firstName);
+                $characterName = self::removeModifierFrom($firstName);
             }
 
             $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
@@ -76,6 +60,22 @@ class CharacterDataParser
         }
 
         return null;
+    }
+
+    private static function createCompleteCharactersFrom(array $allCharactersData): array
+    {
+        $allCharacters = self::buildCharactersFrom($allCharactersData);
+
+        self::completeCharacters($allCharactersData, $allCharacters);
+
+        return $allCharacters;
+    }
+
+    private static function findCharacter(string $name, array $characters): ?Character
+    {
+        return current(array_filter($characters, function (Character $character) use ($name) {
+            return $character->firstName === $name;
+        }));
     }
 
     /**
