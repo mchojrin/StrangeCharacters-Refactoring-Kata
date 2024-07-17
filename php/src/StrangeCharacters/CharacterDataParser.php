@@ -43,17 +43,17 @@ class CharacterDataParser
         $familyName = "";
         $tempPathWithoutCurlyBraces = "";
         $curlyBraces = "";
-        $persons = array_values(array_filter(self::separatePersonsByPath($path)));
+        $persons = array_values(
+            array_filter(
+                self::separatePersonsByPath($path)
+            )
+        );
+
         $character = null;
         for ($i = count($persons) - 1; $i >= 0; $i--) {
-            $currentPersonNames = self::separateNamesByType($persons[$i]);
-            if (count($currentPersonNames) == 2) {
-                $hasFamilyName = true;
+            [$familyName, $localName] = self::separateNames($persons[$i]);
 
-                [$familyName, $localName] = $currentPersonNames;
-            } else {
-                $localName = $currentPersonNames[0];
-            }
+            $hasFamilyName = !empty($familyName);
 
             if ($i == count($persons) - 1) {
                 $curlyBraces = self::getModifierFrom($localName);
@@ -65,19 +65,18 @@ class CharacterDataParser
 
         if (!$hasFamilyName) {
             $character = self::$characterFinder->findByFirstName($characterName);
-
-            return $curlyBraces == "Nemesis" ? $character->getNemesis() : $character;
-        }
-
-        $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
-        if (!empty($familyMembers)) {
-            $personsWithoutCurlyBraces = self::getPersonsIn($tempPathWithoutCurlyBraces);
-            if (count($personsWithoutCurlyBraces) == 2) {
-                $firstName = next($personsWithoutCurlyBraces);
-                $relativesNamedFirstName = self::findRelativesNamed($firstName, $familyMembers);
-                $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
+        } else {
+            $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
+            if (!empty($familyMembers)) {
+                $personsWithoutCurlyBraces = self::getPersonsIn($tempPathWithoutCurlyBraces);
+                if (count($personsWithoutCurlyBraces) == 2) {
+                    $firstName = next($personsWithoutCurlyBraces);
+                    $relativesNamedFirstName = self::findRelativesNamed($firstName, $familyMembers);
+                    $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
+                }
             }
         }
+
 
         if (!empty($character) && $curlyBraces == "Nemesis") {
 
@@ -219,12 +218,12 @@ class CharacterDataParser
     }
 
     /**
-     * @param $structureList
+     * @param string $names
      * @return string[]
      */
-    protected static function separateNamesByType($structureList): array
+    protected static function separateNamesByType(string $names): array
     {
-        return explode(self::NAME_TYPE_SEPARATOR, $structureList);
+        return explode(self::NAME_TYPE_SEPARATOR, $names);
     }
 
     /**
@@ -234,5 +233,16 @@ class CharacterDataParser
     protected static function getPersonsIn(string $tempPathWithoutCurlyBraces): array
     {
         return array_filter(self::separatePersonsByPath($tempPathWithoutCurlyBraces));
+    }
+
+    /**
+     * @param string $names
+     * @return array
+     */
+    protected static function separateNames(string $names): array
+    {
+        $currentPersonNames = self::separateNamesByType($names);
+
+        return count($currentPersonNames) == 2 ? $currentPersonNames : ["", $currentPersonNames[0]];
     }
 }
