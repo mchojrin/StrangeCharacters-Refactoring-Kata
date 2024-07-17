@@ -21,28 +21,10 @@ class CharacterDataParser
 
     private static function createCharactersFromArrayAndFindTheirNemesisAndAddTheirFamily(array $data): array
     {
-        $result = [];
-        foreach ($data as $characterData) {
-            $result[] = Character::withFirstAndLastNameAndMonsterStatus($characterData->FirstName, $characterData->LastName, $characterData->IsMonster);
-        }
+        list($result, $characterData) = self::applesauce($data);
 
         foreach ($data as $characterData) {
-            // find nemesis
-            if (!empty($characterData->Nemesis)) {
-                $nemesis = self::findCharacter($characterData->Nemesis, $result);
-                $character = self::findCharacter($characterData->FirstName, $result);
-                $character->setNemesis($nemesis);
-            }
-
-            // add family
-            if (!empty($characterData->Children)) {
-                $character = self::findCharacter($characterData->FirstName, $result);
-                foreach ($characterData->Children as $childName) {
-                    $child = self::findCharacter($childName, $result);
-                    if ($child != null)
-                        $character->addChild($child);
-                }
-            }
+            self::applesauce2($characterData, $result);
         }
 
         return $result;
@@ -121,5 +103,43 @@ class CharacterDataParser
         }
 
         return $character;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    protected static function applesauce(array $data): array
+    {
+        $result = [];
+        foreach ($data as $characterData) {
+            $result[] = Character::withFirstAndLastNameAndMonsterStatus($characterData->FirstName, $characterData->LastName, $characterData->IsMonster);
+        }
+        return array($result, $characterData);
+    }
+
+    /**
+     * @param mixed $characterData
+     * @param mixed $result
+     * @return void
+     */
+    protected static function applesauce2(mixed $characterData, mixed $result): void
+    {
+// find nemesis
+        if (!empty($characterData->Nemesis)) {
+            $nemesis = self::findCharacter($characterData->Nemesis, $result);
+            $character = self::findCharacter($characterData->FirstName, $result);
+            $character->setNemesis($nemesis);
+        }
+
+        // add family
+        if (!empty($characterData->Children)) {
+            $character = self::findCharacter($characterData->FirstName, $result);
+            foreach ($characterData->Children as $childName) {
+                $child = self::findCharacter($childName, $result);
+                if ($child != null)
+                    $character->addChild($child);
+            }
+        }
     }
 }
