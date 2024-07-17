@@ -59,7 +59,7 @@ class CharacterDataParser
                 $characterName = $localName;
             }
 
-            list($curlyBraces, $characterName) = self::extracted($localName, $curlyBraces, $characterName);
+            [$curlyBraces, $characterName] = self::extracted($localName, $curlyBraces, $characterName);
 
             $tempPathWithoutCurlyBraces = self::PATH_SEPARATOR . self::removeCurlyBracesFrom($localName) . $tempPathWithoutCurlyBraces;
         }
