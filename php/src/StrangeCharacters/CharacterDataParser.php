@@ -190,12 +190,7 @@ class CharacterDataParser
     protected static function extracted(string $localName, mixed $curlyBraces, mixed $characterName): array
     {
         $matches = [];
-        preg_match(self::CURLY_BRACES_PATTERN, $localName, $matches);
-        if (count($matches) > 0) {
-            $curlyBraces = $matches[2];
-            $characterName = $matches[1];
-        }
-        return [$curlyBraces, $characterName];
+        return preg_match(self::CURLY_BRACES_PATTERN, $localName, $matches) ? [$matches[2], $matches[1]] : [$curlyBraces, $characterName];
     }
 
     /**
