@@ -15,11 +15,11 @@ class CharacterDataParser
             $filename = ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json";
         }
 
-        self::$allCharacters = self::applesauce(json_decode(file_get_contents($filename), false));
+        self::$allCharacters = self::createCharactersFromArrayAndFindTheirNemesisAndAddTheirFamily(json_decode(file_get_contents($filename), false));
         self::$characterFinder = new CharacterFinder(self::$allCharacters);
     }
 
-    private static function applesauce(array $data): array
+    private static function createCharactersFromArrayAndFindTheirNemesisAndAddTheirFamily(array $data): array
     {
         $result = [];
         foreach ($data as $characterData) {
