@@ -13,11 +13,11 @@ class CharacterDataParser
 
     public static function createCharactersFromFileAndCreateCharacterFinder(?string $filename): void
     {
-        self::$allCharacters = self::createCharactersFromArrayAndFindTheirNemesisAndAddTheirFamily(self::getAllCharactersDataFrom($filename ?? ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json"));
+        self::$allCharacters = self::createCompleteCharactersFrom(self::getAllCharactersDataFrom($filename ?? ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json"));
         self::$characterFinder = new CharacterFinder(self::$allCharacters);
     }
 
-    private static function createCharactersFromArrayAndFindTheirNemesisAndAddTheirFamily(array $allCharactersData): array
+    private static function createCompleteCharactersFrom(array $allCharactersData): array
     {
         $allCharacters = self::buildCharactersFrom($allCharactersData);
 
