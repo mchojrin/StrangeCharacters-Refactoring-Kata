@@ -56,8 +56,7 @@ class CharacterDataParser
             }
 
             if ($i == count($persons) - 1) {
-                $characterName = $localName;
-                [$curlyBraces, $characterName] = self::separateByCurlyBraces($localName, $curlyBraces, $characterName);
+                [$curlyBraces, $characterName] = self::separateByCurlyBraces($localName);
             }
 
             $tempPathWithoutCurlyBraces = self::PATH_SEPARATOR . self::removeCurlyBracesFrom($localName) . $tempPathWithoutCurlyBraces;
@@ -181,15 +180,13 @@ class CharacterDataParser
 
     /**
      * @param string $localName
-     * @param string $curlyBraces
-     * @param string $characterName
      * @return array
      */
-    protected static function separateByCurlyBraces(string $localName, string $curlyBraces, string $characterName): array
+    protected static function separateByCurlyBraces(string $localName): array
     {
         $matches = [];
 
-        return preg_match(self::CURLY_BRACES_PATTERN, $localName, $matches) ? [$matches[2], $matches[1]] : [$curlyBraces, $characterName];
+        return preg_match(self::CURLY_BRACES_PATTERN, $localName, $matches) ? [$matches[2], $matches[1]] : ["", $localName];
     }
 
     /**
