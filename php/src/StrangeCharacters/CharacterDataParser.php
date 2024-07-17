@@ -42,43 +42,41 @@ class CharacterDataParser
         $familyName = "";
         $tempPathWithoutCurlyBraces = "";
         $curlyBraces = "";
-        $structureList = self::separatePersonsByPath($path);
+        $persons = self::separatePersonsByPath($path);
         $character = null;
-        for ($i = count($structureList) - 1; $i >= 0; $i--) {
-            if (empty($structureList[$i]))
+        for ($i = count($persons) - 1; $i >= 0; $i--) {
+            if (empty($persons[$i]))
                 continue;
             $localName = "";
-            $familyLocalNameList = self::separateNamesByType($structureList[$i]);
-            if (count($familyLocalNameList) == 2) {
-                if (!$hasFamilyName) {
-                    $hasFamilyName = true;
-                }
+            $currentPersonNames = self::separateNamesByType($persons[$i]);
+            if (count($currentPersonNames) == 2) {
+                $hasFamilyName = true;
 
-                [$familyName, $localName] = $familyLocalNameList;
-            } else if (count($familyLocalNameList) == 1) {
-                $localName = $familyLocalNameList[0];
+                [$familyName, $localName] = $currentPersonNames;
+            } else if (count($currentPersonNames) == 1) {
+                $localName = $currentPersonNames[0];
             }
 
-            if ($i == count($structureList) - 1) {
+            if ($i == count($persons) - 1) {
                 $characterName = $localName;
             }
 
             list($curlyBraces, $characterName) = self::extracted($localName, $curlyBraces, $characterName);
 
-            $tempPathWithoutCurlyBraces = self::PATH_SEPARATOR . self::getLocalNameWithoutCurlyBraces($localName) . $tempPathWithoutCurlyBraces;
+            $tempPathWithoutCurlyBraces = self::PATH_SEPARATOR . self::removeCurlyBracesFrom($localName) . $tempPathWithoutCurlyBraces;
         }
 
         if (!$hasFamilyName) {
             $character = self::$characterFinder->findByFirstName($characterName);
 
-            return $curlyBraces == "Nemesis" ? $character->getNemesis(): $character;
+            return $curlyBraces == "Nemesis" ? $character->getNemesis() : $character;
         }
 
         $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
         if (!empty($familyMembers)) {
-            $names = array_filter(self::separatePersonsByPath($tempPathWithoutCurlyBraces));
-            if (count($names) == 2) {
-                $firstName = next($names);
+            $personsWithoutCurlyBraces = self::getPersonsIn($tempPathWithoutCurlyBraces);
+            if (count($personsWithoutCurlyBraces) == 2) {
+                $firstName = next($personsWithoutCurlyBraces);
                 $relativesNamedFirstName = self::findRelativesNamed($firstName, $familyMembers);
                 $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
             }
@@ -206,7 +204,7 @@ class CharacterDataParser
      * @param string $localName
      * @return array|string|string[]|null
      */
-    protected static function getLocalNameWithoutCurlyBraces(string $localName): string|array|null
+    protected static function removeCurlyBracesFrom(string $localName): string|array|null
     {
         return preg_replace("|\{[^{]*?}|", "", $localName);
     }
@@ -237,5 +235,14 @@ class CharacterDataParser
     protected static function separateNamesByType($structureList): array
     {
         return explode(self::NAME_TYPE_SEPARATOR, $structureList);
+    }
+
+    /**
+     * @param string $tempPathWithoutCurlyBraces
+     * @return string[]
+     */
+    protected static function getPersonsIn(string $tempPathWithoutCurlyBraces): array
+    {
+        return array_filter(self::separatePersonsByPath($tempPathWithoutCurlyBraces));
     }
 }
