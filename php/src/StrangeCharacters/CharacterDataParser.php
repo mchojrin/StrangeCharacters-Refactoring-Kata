@@ -21,15 +21,13 @@ class CharacterDataParser
         self::$characterFinder = new CharacterFinder(self::$allCharacters);
     }
 
-    private static function createCharactersFromArrayAndFindTheirNemesisAndAddTheirFamily(array $data): array
+    private static function createCharactersFromArrayAndFindTheirNemesisAndAddTheirFamily(array $allCharactersData): array
     {
-        $result = self::buildCharactersFrom($data);
+        $allCharacters = self::buildCharactersFrom($allCharactersData);
 
-        foreach ($data as $characterData) {
-            self::addNemesisAndFamilyToCharacters($characterData, $result);
-        }
+        self::completeCharacters($allCharactersData, $allCharacters);
 
-        return $result;
+        return $allCharacters;
     }
 
     private static function findCharacter(string $name, array $result): ?Character
@@ -121,7 +119,7 @@ class CharacterDataParser
      * @param array $characters
      * @return void
      */
-    protected static function addNemesisAndFamilyToCharacters(stdClass $characterData, array $characters): void
+    protected static function completeCharacter(stdClass $characterData, array $characters): void
     {
         self::addNemesis($characterData, $characters);
         self::addFamily($characterData, $characters);
@@ -176,5 +174,17 @@ class CharacterDataParser
         $child = self::findCharacter($childName, $characters);
         if ($child != null)
             $character->addChild($child);
+    }
+
+    /**
+     * @param array $allCharactersData
+     * @param array $allCharacters
+     * @return void
+     */
+    protected static function completeCharacters(array $allCharactersData, array $allCharacters): void
+    {
+        foreach ($allCharactersData as $characterData) {
+            self::completeCharacter($characterData, $allCharacters);
+        }
     }
 }
