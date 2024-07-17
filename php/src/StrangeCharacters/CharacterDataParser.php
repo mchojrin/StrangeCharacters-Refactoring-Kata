@@ -73,7 +73,7 @@ class CharacterDataParser
 
         $filteredCharacters = self::$characterFinder->findFamilyByLastName($familyName);
         if (!empty($filteredCharacters)) {
-            $names = array_filter(explode("/", $tempPathWithoutCurlyBraces), fn(string $name) => !empty($name));
+            $names = array_filter(explode("/", $tempPathWithoutCurlyBraces));
             if (count($names) == 2) {
                 $firstName = next($names);
                 $candidates = array_filter($filteredCharacters, fn(Character $c) => ($c->firstName == $firstName));
