@@ -6,11 +6,8 @@ use StrangeCharacters\CharacterDataParser;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$filename = null;
-if ($argc > 1) {
-    $filename = $argv[1];
-    echo "Using character file: $filename" . PHP_EOL;
-}
+$filename = $argc > 1 ? $argv[1] : ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json";
+echo "Using character file: $filename" . PHP_EOL;
 CharacterDataParser::createCharactersFromFileAndCreateCharacterFinder($filename);
 
 while (true) {
@@ -18,7 +15,7 @@ while (true) {
 
     $path = readline();
 
-    if ("exit" ===$path) {
+    if ("exit" === $path) {
         break;
     }
     $character = CharacterDataParser::evaluatePath($path);
