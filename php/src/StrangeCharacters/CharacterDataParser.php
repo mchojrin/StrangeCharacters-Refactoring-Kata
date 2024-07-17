@@ -10,6 +10,7 @@ class CharacterDataParser
 {
     const string PATH_SEPARATOR = "/";
     const string NAME_TYPE_SEPARATOR = ":";
+    const string CURLY_BRACES_PATTERN = "|(.*)\{([^{]*)}|";
     private static array $allCharacters = [];
     private static CharacterFinder $characterFinder;
 
@@ -192,7 +193,7 @@ class CharacterDataParser
     protected static function extracted(string $localName, mixed $curlyBraces, mixed $characterName): array
     {
         $matches = [];
-        preg_match("|(.*)\{([^{]*)}|", $localName, $matches);
+        preg_match(self::CURLY_BRACES_PATTERN, $localName, $matches);
         if (count($matches) > 0) {
             $curlyBraces = $matches[2];
             $characterName = $matches[1];
