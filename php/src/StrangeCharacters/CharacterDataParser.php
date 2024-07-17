@@ -46,15 +46,12 @@ class CharacterDataParser
         $persons = array_values(array_filter(self::separatePersonsByPath($path)));
         $character = null;
         for ($i = count($persons) - 1; $i >= 0; $i--) {
-            if (empty($persons[$i]))
-                continue;
-            $localName = "";
             $currentPersonNames = self::separateNamesByType($persons[$i]);
             if (count($currentPersonNames) == 2) {
                 $hasFamilyName = true;
 
                 [$familyName, $localName] = $currentPersonNames;
-            } else if (count($currentPersonNames) == 1) {
+            } else {
                 $localName = $currentPersonNames[0];
             }
 
