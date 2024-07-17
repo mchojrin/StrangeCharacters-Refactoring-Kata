@@ -35,8 +35,6 @@ class CharacterDataParser
 
     public static function evaluatePath(string $path): ?Character
     {
-        $character = null;
-
         $hasFamilyName = false;
         $characterName = "";
         $familyName = "";
@@ -77,11 +75,8 @@ class CharacterDataParser
 
         if (!$hasFamilyName) {
             $character = self::$characterFinder->findByFirstName($characterName);
-            if ($curlyBraces == "Nemesis") {
-                return $character->getNemesis();
-            }
 
-            return $character;
+            return $curlyBraces == "Nemesis" ? $character->getNemesis(): $character;
         }
 
         $filteredCharacters = self::$characterFinder->findFamilyByLastName($familyName);
