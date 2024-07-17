@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace StrangeCharacters;
 
+use stdClass;
+
 class CharacterDataParser
 {
     private static array $allCharacters = [];
@@ -21,7 +23,7 @@ class CharacterDataParser
 
     private static function createCharactersFromArrayAndFindTheirNemesisAndAddTheirFamily(array $data): array
     {
-        list($result, $characterData) = self::applesauce($data);
+        $result = self::buildCharactersFrom($data);
 
         foreach ($data as $characterData) {
             self::applesauce2($characterData, $result);
@@ -109,13 +111,9 @@ class CharacterDataParser
      * @param array $data
      * @return array
      */
-    protected static function applesauce(array $data): array
+    protected static function buildCharactersFrom(array $data): array
     {
-        $result = [];
-        foreach ($data as $characterData) {
-            $result[] = Character::withFirstAndLastNameAndMonsterStatus($characterData->FirstName, $characterData->LastName, $characterData->IsMonster);
-        }
-        return array($result, $characterData);
+        return array_map(fn(stdClass $characterData) => Character::withFirstAndLastNameAndMonsterStatus($characterData->FirstName, $characterData->LastName, $characterData->IsMonster), $data);
     }
 
     /**
