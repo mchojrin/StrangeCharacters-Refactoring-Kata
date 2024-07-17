@@ -11,7 +11,7 @@ if ($argc > 1) {
     $filename = $argv[1];
     echo "Using character file: $filename" . PHP_EOL;
 }
-CharacterDataParser::probably_InitializeFromFile_AndStuff($filename);
+CharacterDataParser::createCharactersFromFileAndCreateCharacterFinder($filename);
 
 while (true) {
     echo "Please enter the path to evaluate: (type 'exit' to exit program)".PHP_EOL;

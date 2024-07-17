@@ -11,13 +11,9 @@ class CharacterDataParser
     private static array $allCharacters = [];
     private static CharacterFinder $characterFinder;
 
-    public static function probably_InitializeFromFile_AndStuff(?string $filename): void
+    public static function createCharactersFromFileAndCreateCharacterFinder(?string $filename): void
     {
-        if ($filename == null) {
-            $filename = ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json";
-        }
-
-        self::$allCharacters = self::createCharactersFromArrayAndFindTheirNemesisAndAddTheirFamily(json_decode(file_get_contents($filename), false));
+        self::$allCharacters = self::createCharactersFromArrayAndFindTheirNemesisAndAddTheirFamily(self::getAllCharactersDataFrom($filename ?? ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json"));
         self::$characterFinder = new CharacterFinder(self::$allCharacters);
     }
 
@@ -186,5 +182,14 @@ class CharacterDataParser
         foreach ($allCharactersData as $characterData) {
             self::completeCharacter($characterData, $allCharacters);
         }
+    }
+
+    /**
+     * @param string $filename
+     * @return mixed
+     */
+    protected static function getAllCharactersDataFrom(string $filename): mixed
+    {
+        return json_decode(file_get_contents($filename), false);
     }
 }
