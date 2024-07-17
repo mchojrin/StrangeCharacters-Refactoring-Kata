@@ -40,50 +40,42 @@ class CharacterDataParser
     {
         $hasFamilyName = false;
         $characterName = "";
-        $familyName = "";
-        $tempPathWithoutCurlyBraces = "";
-        $curlyBraces = "";
-        $persons = array_values(
-            array_filter(
-                self::separatePersonsByPath($path)
-            )
-        );
+        $tempPathWithoutModifier = "";
+        $modifier = "";
+        $persons = self::getPersonsFrom($path);
 
-        $character = null;
         for ($i = count($persons) - 1; $i >= 0; $i--) {
             [$familyName, $localName] = self::separateNames($persons[$i]);
 
             $hasFamilyName = !empty($familyName);
 
             if ($i == count($persons) - 1) {
-                $curlyBraces = self::getModifierFrom($localName);
+                $modifier = self::getModifierFrom($localName);
                 $characterName = self::removeModifierFrom($localName);
             }
 
-            $tempPathWithoutCurlyBraces = self::PATH_SEPARATOR . $characterName . $tempPathWithoutCurlyBraces;
+            $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
         }
 
-        if (!$hasFamilyName) {
-            $character = self::$characterFinder->findByFirstName($characterName);
-        } else {
+        if ($hasFamilyName) {
             $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
             if (!empty($familyMembers)) {
-                $personsWithoutCurlyBraces = self::getPersonsIn($tempPathWithoutCurlyBraces);
+                $personsWithoutCurlyBraces = self::getPersonsIn($tempPathWithoutModifier);
                 if (count($personsWithoutCurlyBraces) == 2) {
-                    $firstName = next($personsWithoutCurlyBraces);
-                    $relativesNamedFirstName = self::findRelativesNamed($firstName, $familyMembers);
+                    $relativesNamedFirstName = self::findRelativesNamed(next($personsWithoutCurlyBraces), $familyMembers);
                     $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
                 }
             }
+        } else {
+            $character = self::$characterFinder->findByFirstName($characterName);
         }
 
+        if (!empty($character) ) {
 
-        if (!empty($character) && $curlyBraces == "Nemesis") {
-
-            return $character->getNemesis();
+            return $modifier == "Nemesis" ? $character->getNemesis() : $character;
         }
 
-        return $character;
+        return null;
     }
 
     /**
@@ -244,5 +236,18 @@ class CharacterDataParser
         $currentPersonNames = self::separateNamesByType($names);
 
         return count($currentPersonNames) == 2 ? $currentPersonNames : ["", $currentPersonNames[0]];
+    }
+
+    /**
+     * @param string $path
+     * @return array
+     */
+    protected static function getPersonsFrom(string $path): array
+    {
+        return array_values(
+            array_filter(
+                self::separatePersonsByPath($path)
+            )
+        );
     }
 }
