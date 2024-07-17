@@ -8,6 +8,7 @@ use stdClass;
 
 class CharacterDataParser
 {
+    const string PATH_SEPARATOR = "/";
     private static array $allCharacters = [];
     private static CharacterFinder $characterFinder;
 
@@ -40,7 +41,8 @@ class CharacterDataParser
         $familyName = "";
         $tempPathWithoutCurlyBraces = "";
         $curlyBraces = "";
-        $structureList = explode("/", $path);
+        $structureList = self::separateNamesByPath($path);
+        $character = null;
         for ($i = count($structureList) - 1; $i >= 0; $i--) {
             if (empty($structureList[$i]))
                 continue;
@@ -62,7 +64,7 @@ class CharacterDataParser
 
             list($curlyBraces, $characterName) = self::extracted($localName, $curlyBraces, $characterName);
 
-            $tempPathWithoutCurlyBraces = "/" . self::getLocalNameWithoutCurlyBraces($localName) . $tempPathWithoutCurlyBraces;
+            $tempPathWithoutCurlyBraces = self::PATH_SEPARATOR . self::getLocalNameWithoutCurlyBraces($localName) . $tempPathWithoutCurlyBraces;
         }
 
         if (!$hasFamilyName) {
@@ -73,16 +75,17 @@ class CharacterDataParser
 
         $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
         if (!empty($familyMembers)) {
-            $names = array_filter(explode("/", $tempPathWithoutCurlyBraces));
+            $names = array_filter(self::separateNamesByPath($tempPathWithoutCurlyBraces));
             if (count($names) == 2) {
                 $firstName = next($names);
                 $relativesNamedFirstName = self::findRelativesNamed($firstName, $familyMembers);
                 $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
             }
-            if ($character != null && $curlyBraces == "Nemesis") {
+        }
 
-                return $character->getNemesis();
-            }
+        if (!empty($character) && $curlyBraces == "Nemesis") {
+
+            return $character->getNemesis();
         }
 
         return $character;
@@ -215,5 +218,14 @@ class CharacterDataParser
     protected static function findRelativesNamed(string $firstName, array $familyMembers): array
     {
         return array_filter($familyMembers, fn(Character $c) => ($c->firstName == $firstName));
+    }
+
+    /**
+     * @param string $tempPathWithoutCurlyBraces
+     * @return string[]
+     */
+    protected static function separateNamesByPath(string $tempPathWithoutCurlyBraces): array
+    {
+        return explode(self::PATH_SEPARATOR, $tempPathWithoutCurlyBraces);
     }
 }
