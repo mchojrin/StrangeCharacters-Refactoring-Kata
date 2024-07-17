@@ -9,6 +9,7 @@ use stdClass;
 class CharacterDataParser
 {
     const string PATH_SEPARATOR = "/";
+    const string NAME_TYPE_SEPARATOR = ":";
     private static array $allCharacters = [];
     private static CharacterFinder $characterFinder;
 
@@ -41,13 +42,13 @@ class CharacterDataParser
         $familyName = "";
         $tempPathWithoutCurlyBraces = "";
         $curlyBraces = "";
-        $structureList = self::separateNamesByPath($path);
+        $structureList = self::separatePersonsByPath($path);
         $character = null;
         for ($i = count($structureList) - 1; $i >= 0; $i--) {
             if (empty($structureList[$i]))
                 continue;
             $localName = "";
-            $familyLocalNameList = explode(":", $structureList[$i]);
+            $familyLocalNameList = self::separateNamesByType($structureList[$i]);
             if (count($familyLocalNameList) == 2) {
                 if (!$hasFamilyName) {
                     $hasFamilyName = true;
@@ -75,7 +76,7 @@ class CharacterDataParser
 
         $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
         if (!empty($familyMembers)) {
-            $names = array_filter(self::separateNamesByPath($tempPathWithoutCurlyBraces));
+            $names = array_filter(self::separatePersonsByPath($tempPathWithoutCurlyBraces));
             if (count($names) == 2) {
                 $firstName = next($names);
                 $relativesNamedFirstName = self::findRelativesNamed($firstName, $familyMembers);
@@ -224,8 +225,17 @@ class CharacterDataParser
      * @param string $tempPathWithoutCurlyBraces
      * @return string[]
      */
-    protected static function separateNamesByPath(string $tempPathWithoutCurlyBraces): array
+    protected static function separatePersonsByPath(string $tempPathWithoutCurlyBraces): array
     {
         return explode(self::PATH_SEPARATOR, $tempPathWithoutCurlyBraces);
+    }
+
+    /**
+     * @param $structureList
+     * @return string[]
+     */
+    protected static function separateNamesByType($structureList): array
+    {
+        return explode(self::NAME_TYPE_SEPARATOR, $structureList);
     }
 }
