@@ -71,12 +71,12 @@ class CharacterDataParser
             return $curlyBraces == "Nemesis" ? $character->getNemesis(): $character;
         }
 
-        $filteredCharacters = self::$characterFinder->findFamilyByLastName($familyName);
-        if (!empty($filteredCharacters)) {
+        $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
+        if (!empty($familyMembers)) {
             $names = array_filter(explode("/", $tempPathWithoutCurlyBraces));
             if (count($names) == 2) {
                 $firstName = next($names);
-                $candidates = array_filter($filteredCharacters, fn(Character $c) => ($c->firstName == $firstName));
+                $candidates = array_filter($familyMembers, fn(Character $c) => ($c->firstName == $firstName));
                 $character = !empty($candidates) ? current($candidates) : null;
             }
             if ($character != null && $curlyBraces == "Nemesis") {
