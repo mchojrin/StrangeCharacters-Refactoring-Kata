@@ -13,7 +13,7 @@ class CharacterDataParser
     private static array $allCharacters = [];
     private static CharacterFinder $characterFinder;
 
-    public static function createCharactersFromFileAndCreateCharacterFinder(?string $filename): void
+    public static function initWithDataFrom(?string $filename): void
     {
         self::$allCharacters = self::createCompleteCharactersFrom(self::getAllCharactersDataFrom($filename ?? ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json"));
         self::$characterFinder = new CharacterFinder(self::$allCharacters);
@@ -42,7 +42,7 @@ class CharacterDataParser
         $familyName = "";
         $tempPathWithoutCurlyBraces = "";
         $curlyBraces = "";
-        $persons = self::separatePersonsByPath($path);
+        $persons = array_values(array_filter(self::separatePersonsByPath($path)));
         $character = null;
         for ($i = count($persons) - 1; $i >= 0; $i--) {
             if (empty($persons[$i]))
