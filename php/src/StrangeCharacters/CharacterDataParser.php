@@ -56,10 +56,11 @@ class CharacterDataParser
             }
 
             if ($i == count($persons) - 1) {
-                [$curlyBraces, $characterName] = self::separateByCurlyBraces($localName);
+                $curlyBraces = self::getModifierFrom($localName);
+                $characterName = self::removeModifierFrom($localName);
             }
 
-            $tempPathWithoutCurlyBraces = self::PATH_SEPARATOR . self::removeCurlyBracesFrom($localName) . $tempPathWithoutCurlyBraces;
+            $tempPathWithoutCurlyBraces = self::PATH_SEPARATOR . $characterName . $tempPathWithoutCurlyBraces;
         }
 
         if (!$hasFamilyName) {
@@ -180,20 +181,20 @@ class CharacterDataParser
 
     /**
      * @param string $localName
-     * @return array
+     * @return string
      */
-    protected static function separateByCurlyBraces(string $localName): array
+    protected static function getModifierFrom(string $localName): string
     {
         $matches = [];
 
-        return preg_match(self::CURLY_BRACES_PATTERN, $localName, $matches) ? [$matches[2], $matches[1]] : ["", $localName];
+        return preg_match(self::CURLY_BRACES_PATTERN, $localName, $matches) ? $matches[2] : "";
     }
 
     /**
      * @param string $localName
-     * @return array|string|string[]|null
+     * @return string
      */
-    protected static function removeCurlyBracesFrom(string $localName): string|array|null
+    protected static function removeModifierFrom(string $localName): string
     {
         return preg_replace("|\{[^{]*?}|", "", $localName);
     }
