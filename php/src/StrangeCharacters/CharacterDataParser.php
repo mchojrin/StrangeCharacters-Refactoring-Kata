@@ -26,7 +26,7 @@ class CharacterDataParser
         $result = self::buildCharactersFrom($data);
 
         foreach ($data as $characterData) {
-            self::applesauce2($characterData, $result);
+            self::addNemesisAndFamilyToCharacters($characterData, $result);
         }
 
         return $result;
@@ -121,16 +121,34 @@ class CharacterDataParser
      * @param mixed $result
      * @return void
      */
-    protected static function applesauce2(mixed $characterData, mixed $result): void
+    protected static function addNemesisAndFamilyToCharacters(mixed $characterData, mixed $result): void
     {
-// find nemesis
-        if (!empty($characterData->Nemesis)) {
-            $nemesis = self::findCharacter($characterData->Nemesis, $result);
-            $character = self::findCharacter($characterData->FirstName, $result);
-            $character->setNemesis($nemesis);
-        }
+        $character = self::addNemesis($characterData, $result);
+        self::addFamily($characterData, $result);
 
-        // add family
+    }
+
+    /**
+     * @param stdClass $characterData
+     * @param array $result
+     * @return void
+     */
+    protected static function addNemesis(stdClass $characterData, array $result): void
+    {
+        if (!empty($characterData->Nemesis)) {
+            $character = self::findCharacter($characterData->FirstName, $result);
+            $character->setNemesis(self::findCharacter($characterData->Nemesis, $result));
+        }
+    }
+
+    /**
+     * @param mixed $characterData
+     * @param mixed $result
+     * @return void
+     */
+    protected static function addFamily(mixed $characterData, mixed $result): void
+    {
+// add family
         if (!empty($characterData->Children)) {
             $character = self::findCharacter($characterData->FirstName, $result);
             foreach ($characterData->Children as $childName) {
