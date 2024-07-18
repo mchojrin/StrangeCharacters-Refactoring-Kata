@@ -22,7 +22,7 @@ readonly class CharacterFinder
      * @param string $tempPathWithoutCurlyBraces
      * @return string[]
      */
-    public static function separateNamesByPath(string $tempPathWithoutCurlyBraces): array
+    public function separateNamesByPath(string $tempPathWithoutCurlyBraces): array
     {
         return explode(self::PATH_SEPARATOR, $tempPathWithoutCurlyBraces);
     }

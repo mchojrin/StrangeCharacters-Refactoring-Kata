@@ -167,7 +167,7 @@ class CharacterDataParser
      */
     private static function getNamesIn(string $path): array
     {
-        return array_filter(CharacterFinder::separateNamesByPath($path));
+        return array_filter(self::$characterFinder->separateNamesByPath($path));
     }
 
     /**
@@ -189,7 +189,7 @@ class CharacterDataParser
     {
         return array_values(
             array_filter(
-                CharacterFinder::separateNamesByPath($path)
+                self::$characterFinder->separateNamesByPath($path)
             )
         );
     }
