@@ -265,14 +265,14 @@ class CharacterDataParser
      */
     private static function findFamilyMemberByName(string $lastName, string $path): ?Character
     {
-        $familyMembers = self::$characterFinder->findFamilyByLastName($lastName);
-        if (!empty($familyMembers)) {
-            $relativeNames = self::getNamesIn($path);
-            if (count($relativeNames) == 2) {
-                $relativesNamedFirstName = CharacterFinder::findRelativesNamed(next($relativeNames), $familyMembers);
+        $family = self::$characterFinder->findFamilyByLastName($lastName);
+        if (!empty($family)) {
+            $names = self::getNamesIn($path);
+            if (count($names) == 2) {
+                $character = self::$characterFinder->findInGroup(next($names), $family);
             }
         }
 
-        return !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
+        return !empty($character) ? $character : null;
     }
 }
