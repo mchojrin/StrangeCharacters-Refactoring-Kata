@@ -162,15 +162,6 @@ class CharacterDataParser
     }
 
     /**
-     * @param string $path
-     * @return string[]
-     */
-    private static function getNamesIn(string $path): array
-    {
-        return array_filter(self::$characterFinder->separateNamesByPath($path));
-    }
-
-    /**
      * @param string $names
      * @return array
      */
@@ -257,7 +248,7 @@ class CharacterDataParser
     {
         $family = self::$characterFinder->findFamilyByLastName($lastName);
         if (!empty($family)) {
-            $names = self::getNamesIn($path);
+            $names = self::$characterFinder->getNamesIn($path);
             if (count($names) == 2) {
                 $character = self::$characterFinder->findInGroup(next($names), $family);
             }

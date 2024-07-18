@@ -19,6 +19,15 @@ readonly class CharacterFinder
     }
 
     /**
+     * @param string $path
+     * @return string[]
+     */
+    public function getNamesIn(string $path): array
+    {
+        return array_filter($this->separateNamesByPath($path));
+    }
+
+    /**
      * @param string $tempPathWithoutCurlyBraces
      * @return string[]
      */
