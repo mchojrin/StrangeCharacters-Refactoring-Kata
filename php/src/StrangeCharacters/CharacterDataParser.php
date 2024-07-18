@@ -133,15 +133,6 @@ class CharacterDataParser
     }
 
     /**
-     * @param string $localName
-     * @return string
-     */
-    private static function extractPureNameFrom(string $localName): string
-    {
-        return preg_replace("|\{[^{]*?}|", "", $localName);
-    }
-
-    /**
      * @param string $path
      * @return CharacterSearchCriteria
      */
@@ -156,7 +147,7 @@ class CharacterDataParser
 
             if ($i == count($persons) - 1) {
                 $relation = CharacterFinder::getRelationFrom($firstName);
-                $characterName = self::extractPureNameFrom($firstName);
+                $characterName = CharacterFinder::extractPureNameFrom($firstName);
             }
 
             $tempPathWithoutModifier = CharacterFinder::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;

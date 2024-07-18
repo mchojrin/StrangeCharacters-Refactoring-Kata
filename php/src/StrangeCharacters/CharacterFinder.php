@@ -50,6 +50,15 @@ readonly class CharacterFinder
     }
 
     /**
+     * @param string $localName
+     * @return string
+     */
+    public static function extractPureNameFrom(string $localName): string
+    {
+        return preg_replace("|\{[^{]*?}|", "", $localName);
+    }
+
+    /**
      * @param string $path
      * @return array
      */
