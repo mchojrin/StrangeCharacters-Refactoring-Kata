@@ -146,7 +146,7 @@ class CharacterDataParser
             [$familyName, $firstName] = self::$characterFinder->separateNames($persons[$i]);
 
             if ($i == count($persons) - 1) {
-                $relation = CharacterFinder::getRelationFrom($firstName);
+                $relation = self::$characterFinder->getRelationFrom($firstName);
                 $characterName = CharacterFinder::extractPureNameFrom($firstName);
             }
 

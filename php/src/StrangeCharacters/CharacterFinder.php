@@ -42,7 +42,7 @@ readonly class CharacterFinder
      * @param string $localName
      * @return string
      */
-    public static function getRelationFrom(string $localName): string
+    public function getRelationFrom(string $localName): string
     {
         $matches = [];
 
