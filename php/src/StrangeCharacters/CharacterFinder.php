@@ -28,6 +28,17 @@ readonly class CharacterFinder
     }
 
     /**
+     * @param string $names
+     * @return array
+     */
+    public static function separateNames(string $names): array
+    {
+        $currentPersonNames = CharacterFinder::separateNamesByType($names);
+
+        return count($currentPersonNames) == 2 ? $currentPersonNames : ["", $currentPersonNames[0]];
+    }
+
+    /**
      * @param string $path
      * @return array
      */

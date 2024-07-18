@@ -153,17 +153,6 @@ class CharacterDataParser
     }
 
     /**
-     * @param string $names
-     * @return array
-     */
-    private static function separateNames(string $names): array
-    {
-        $currentPersonNames = CharacterFinder::separateNamesByType($names);
-
-        return count($currentPersonNames) == 2 ? $currentPersonNames : ["", $currentPersonNames[0]];
-    }
-
-    /**
      * @param string $path
      * @return CharacterSearchCriteria
      */
@@ -174,7 +163,7 @@ class CharacterDataParser
         $persons = self::$characterFinder->getNamesFrom($path);
 
         for ($i = count($persons) - 1; $i >= 0; $i--) {
-            [$familyName, $firstName] = self::separateNames($persons[$i]);
+            [$familyName, $firstName] = CharacterFinder::separateNames($persons[$i]);
 
             if ($i == count($persons) - 1) {
                 $relation = self::getRelationFrom($firstName);
