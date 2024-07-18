@@ -174,26 +174,13 @@ class CharacterDataParser
 
     /**
      * @param string $path
-     * @return array
-     */
-    private static function getNamesFrom(string $path): array
-    {
-        return array_values(
-            array_filter(
-                self::$characterFinder->separateNamesByPath($path)
-            )
-        );
-    }
-
-    /**
-     * @param string $path
      * @return CharacterSearchCriteria
      */
     private static function buildSearchCriteriaFrom(string $path): CharacterSearchCriteria
     {
         $characterName = "";
         $tempPathWithoutModifier = "";
-        $persons = self::getNamesFrom($path);
+        $persons = self::$characterFinder->getNamesFrom($path);
 
         for ($i = count($persons) - 1; $i >= 0; $i--) {
             [$familyName, $firstName] = self::separateNames($persons[$i]);

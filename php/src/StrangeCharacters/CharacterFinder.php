@@ -19,6 +19,19 @@ readonly class CharacterFinder
     }
 
     /**
+     * @param string $path
+     * @return array
+     */
+    public function getNamesFrom(string $path): array
+    {
+        return array_values(
+            array_filter(
+                $this->separateNamesByPath($path)
+            )
+        );
+    }
+
+    /**
      * @param CharacterSearchCriteria $criteria
      * @return Character|null
      */
