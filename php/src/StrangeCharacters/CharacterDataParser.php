@@ -38,13 +38,13 @@ class CharacterDataParser
         return array_map(fn(stdClass $characterData) => Character::withFirstAndLastNameAndMonsterStatus($characterData->FirstName, $characterData->LastName, $characterData->IsMonster), $data);
     }
 
-    private function nonStaticCompleteCharacter(stdClass $characterData, array $characters): void
+    private function completeCharacter(stdClass $characterData, array $characters): void
     {
-        $this->nonStaticAddNemesis($characterData);
-        $this->nonStaticAddFamily($characterData, $characters);
+        $this->addNemesis($characterData);
+        $this->addFamily($characterData, $characters);
     }
 
-    private function nonStaticAddNemesis(stdClass $characterData): void
+    private function addNemesis(stdClass $characterData): void
     {
         if (!empty($characterData->Nemesis)) {
             $character = $this->finder->find($characterData->FirstName);
@@ -52,22 +52,22 @@ class CharacterDataParser
         }
     }
 
-    private function nonStaticAddFamily(stdClass $characterData, array $characters): void
+    private function addFamily(stdClass $characterData, array $characters): void
     {
         if (!empty($characterData->Children)) {
-            $this->nonStaticAddChildren($this->finder->find($characterData->FirstName), $characterData, $characters);
+            $this->addChildren($this->finder->find($characterData->FirstName), $characterData, $characters);
         }
     }
 
-    private function nonStaticAddChildren(Character $character, stdClass $characterData, array $characters): void
+    private function addChildren(Character $character, stdClass $characterData, array $characters): void
     {
         foreach ($characterData->Children as $childName) {
-            $this->nonStaticAddChild($character, $childName, $characters);
+            $this->addChild($character, $childName, $characters);
         }
     }
 
 
-    private function nonStaticAddChild(Character $character, string $childName, array $characters): void
+    private function addChild(Character $character, string $childName, array $characters): void
     {
         $child = $this->finder->findChild($characters, $childName);
 
@@ -78,13 +78,13 @@ class CharacterDataParser
 
     private function complete(array $allCharactersData, array $allCharacters): void
     {
-        $this->nonStaticCompleteCharacters($allCharactersData, $allCharacters);
+        $this->completeCharacters($allCharactersData, $allCharacters);
     }
 
-    private function nonStaticCompleteCharacters(array $allCharactersData, array $allCharacters): void
+    private function completeCharacters(array $allCharactersData, array $allCharacters): void
     {
         foreach ($allCharactersData as $characterData) {
-            $this->nonStaticCompleteCharacter($characterData, $allCharacters);
+            $this->completeCharacter($characterData, $allCharacters);
         }
     }
 
