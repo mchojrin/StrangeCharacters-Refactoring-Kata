@@ -9,6 +9,12 @@ use StrangeCharacters\CharacterDataParser;
 class CharacterDataParserTest extends TestCase
 {
     #[Test]
+    public function non_static() {
+        $parser = new CharacterDataParser();
+        self::assertEquals("Eleven", $parser->findByPath("/Jim/Eleven")->firstName);
+    }
+
+    #[Test]
     public function findCharacterByPath(): void
     {
         CharacterDataParser::initWithDataFrom(null);

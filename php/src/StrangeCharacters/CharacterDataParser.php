@@ -63,6 +63,12 @@ class CharacterDataParser
         self::addFamily($characterData, $characters);
     }
 
+    private function nonStaticCompleteCharacter(stdClass $characterData, array $characters): void
+    {
+        $this->nonStaticAddNemesis($characterData);
+        $this->nonStaticAddFamily($characterData, $characters);
+    }
+
     /**
      * @param stdClass $characterData
      * @return void
@@ -75,6 +81,14 @@ class CharacterDataParser
         }
     }
 
+    private function nonStaticAddNemesis(stdClass $characterData): void
+    {
+        if (!empty($characterData->Nemesis)) {
+            $character = $this->finder->find($characterData->FirstName);
+            $character->setNemesis($this->finder->find($characterData->Nemesis));
+        }
+    }
+
     /**
      * @param stdClass $characterData
      * @param array $characters
@@ -84,6 +98,13 @@ class CharacterDataParser
     {
         if (!empty($characterData->Children)) {
             self::addChildren(self::$characterFinder->find($characterData->FirstName), $characterData, $characters);
+        }
+    }
+
+    private function nonStaticAddFamily(stdClass $characterData, array $characters): void
+    {
+        if (!empty($characterData->Children)) {
+            $this->nonStaticAddChildren($this->finder->find($characterData->FirstName), $characterData, $characters);
         }
     }
 
@@ -100,6 +121,14 @@ class CharacterDataParser
         }
     }
 
+    private function nonStaticAddChildren(Character $character, stdClass $characterData, array $characters): void
+    {
+        foreach ($characterData->Children as $childName) {
+            $this->nonStaticAddChild($character, $childName, $characters);
+        }
+    }
+
+
     /**
      * @param Character $character
      * @param string $childName
@@ -115,9 +144,18 @@ class CharacterDataParser
         }
     }
 
+    private function nonStaticAddChild(Character $character, string $childName, array $characters): void
+    {
+        $child = $this->finder->findChild($characters, $childName);
+
+        if ($child != null) {
+            $character->addChild($child);
+        }
+    }
+
     private function complete(array $allCharactersData, array $allCharacters): void
     {
-        self::completeCharacters($allCharactersData, $allCharacters);
+        $this->nonStaticCompleteCharacters($allCharactersData, $allCharacters);
     }
     /**
      * @param array $allCharactersData
@@ -128,6 +166,13 @@ class CharacterDataParser
     {
         foreach ($allCharactersData as $characterData) {
             self::completeCharacter($characterData, $allCharacters);
+        }
+    }
+
+    private function nonStaticCompleteCharacters(array $allCharactersData, array $allCharacters): void
+    {
+        foreach ($allCharactersData as $characterData) {
+            $this->nonStaticCompleteCharacter($characterData, $allCharacters);
         }
     }
 
