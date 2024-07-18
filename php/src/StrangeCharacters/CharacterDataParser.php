@@ -25,7 +25,6 @@ class CharacterDataParser
         $hasFamilyName = false;
         $characterName = "";
         $tempPathWithoutModifier = "";
-        $relation = "";
         $persons = self::getPersonsFrom($path);
 
         for ($i = count($persons) - 1; $i >= 0; $i--) {
@@ -41,7 +40,9 @@ class CharacterDataParser
             $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
         }
 
-        return self::findCharacterOrRelated($hasFamilyName, $familyName ?? "", $tempPathWithoutModifier, $characterName, $relation);
+        $searchCriteria = new CharacterSearchCriteria($characterName,  $tempPathWithoutModifier,$relation ?? "", $hasFamilyName, $familyName ?? "");
+
+        return self::findCharacterOrRelated($searchCriteria);
     }
 
     private static function createCompleteCharactersFrom(array $allCharactersData): array
@@ -234,31 +235,27 @@ class CharacterDataParser
     }
 
     /**
-     * @param bool $hasFamilyName
-     * @param mixed $familyName
-     * @param string $tempPathWithoutModifier
-     * @param string $characterName
-     * @param string $modifier
-     * @return mixed|Character|null
+     * @param CharacterSearchCriteria $criteria
+     * @return Character|null
      */
-    protected static function findCharacterOrRelated(bool $hasFamilyName, mixed $familyName, string $tempPathWithoutModifier, string $characterName, string $modifier): mixed
+    protected static function findCharacterOrRelated(CharacterSearchCriteria $criteria): ?Character
     {
-        if ($hasFamilyName) {
-            $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
+        if ($criteria->hasFamilyName) {
+            $familyMembers = self::$characterFinder->findFamilyByLastName($criteria->familyName);
             if (!empty($familyMembers)) {
-                $personsWithoutCurlyBraces = self::getPersonsIn($tempPathWithoutModifier);
+                $personsWithoutCurlyBraces = self::getPersonsIn($criteria->tempPathWithoutModifier);
                 if (count($personsWithoutCurlyBraces) == 2) {
                     $relativesNamedFirstName = self::findRelativesNamed(next($personsWithoutCurlyBraces), $familyMembers);
                     $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
                 }
             }
         } else {
-            $character = self::$characterFinder->findByFirstName($characterName);
+            $character = self::$characterFinder->findByFirstName($criteria->characterName);
         }
 
         if (!empty($character)) {
 
-            return $modifier == "Nemesis" ? $character->getNemesis() : $character;
+            return $criteria->relation == "Nemesis" ? $character->getNemesis() : $character;
         }
 
         return null;
