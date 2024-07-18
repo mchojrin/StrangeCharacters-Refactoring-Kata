@@ -22,27 +22,7 @@ class CharacterDataParser
 
     public static function findCharacterByPath(string $path): ?Character
     {
-        $hasFamilyName = false;
-        $characterName = "";
-        $tempPathWithoutModifier = "";
-        $persons = self::getPersonsFrom($path);
-
-        for ($i = count($persons) - 1; $i >= 0; $i--) {
-            [$familyName, $firstName] = self::separateNames($persons[$i]);
-
-            $hasFamilyName = $hasFamilyName || !empty($familyName);
-
-            if ($i == count($persons) - 1) {
-                $relation = self::getModifierFrom($firstName);
-                $characterName = self::removeModifierFrom($firstName);
-            }
-
-            $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
-        }
-
-        $searchCriteria = new CharacterSearchCriteria($characterName,  $tempPathWithoutModifier,$relation ?? "", $hasFamilyName, $familyName ?? "");
-
-        return self::findCharacterOrRelated($searchCriteria);
+        return self::findCharacterOrRelated(self::buildSearchCriteriaFrom($path));
     }
 
     private static function createCompleteCharactersFrom(array $allCharactersData): array
@@ -259,5 +239,33 @@ class CharacterDataParser
         }
 
         return null;
+    }
+
+    /**
+     * @param string $path
+     * @return CharacterSearchCriteria
+     */
+    protected static function buildSearchCriteriaFrom(string $path): CharacterSearchCriteria
+    {
+        $hasFamilyName = false;
+        $characterName = "";
+        $tempPathWithoutModifier = "";
+        $persons = self::getPersonsFrom($path);
+
+        for ($i = count($persons) - 1; $i >= 0; $i--) {
+            [$familyName, $firstName] = self::separateNames($persons[$i]);
+
+            $hasFamilyName = $hasFamilyName || !empty($familyName);
+
+            if ($i == count($persons) - 1) {
+                $relation = self::getModifierFrom($firstName);
+                $characterName = self::removeModifierFrom($firstName);
+            }
+
+            $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
+        }
+
+        $searchCriteria = new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation ?? "", $hasFamilyName, $familyName ?? "");
+        return $searchCriteria;
     }
 }
