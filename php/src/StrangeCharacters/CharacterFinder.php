@@ -19,6 +19,15 @@ readonly class CharacterFinder
     }
 
     /**
+     * @param string $names
+     * @return string[]
+     */
+    public static function separateNamesByType(string $names): array
+    {
+        return explode(CharacterDataParser::NAME_TYPE_SEPARATOR, $names);
+    }
+
+    /**
      * @param string $path
      * @return array
      */

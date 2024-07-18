@@ -154,20 +154,11 @@ class CharacterDataParser
 
     /**
      * @param string $names
-     * @return string[]
-     */
-    private static function separateNamesByType(string $names): array
-    {
-        return explode(self::NAME_TYPE_SEPARATOR, $names);
-    }
-
-    /**
-     * @param string $names
      * @return array
      */
     private static function separateNames(string $names): array
     {
-        $currentPersonNames = self::separateNamesByType($names);
+        $currentPersonNames = CharacterFinder::separateNamesByType($names);
 
         return count($currentPersonNames) == 2 ? $currentPersonNames : ["", $currentPersonNames[0]];
     }
