@@ -18,81 +18,9 @@ readonly class CharacterFinder
     {
     }
 
-    /**
-     * @param string $path
-     * @return CharacterSearchCriteria
-     */
-    public function buildSearchCriteriaFrom(string $path): CharacterSearchCriteria
+    public function findByPath(string $path): ?Character
     {
-        $characterName = "";
-        $tempPathWithoutModifier = "";
-        $persons = $this->getNamesFrom($path);
-
-        for ($i = count($persons) - 1; $i >= 0; $i--) {
-            [$familyName, $firstName] = $this->separateNames($persons[$i]);
-
-            if ($i == count($persons) - 1) {
-                $relation = $this->getRelationFrom($firstName);
-                $characterName = $this->extractPureNameFrom($firstName);
-            }
-
-            $tempPathWithoutModifier = CharacterFinder::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
-        }
-
-        return new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation, $familyName);
-    }
-
-    /**
-     * @param string $names
-     * @return string[]
-     */
-    public function separateNamesByType(string $names): array
-    {
-        return explode(CharacterDataParser::NAME_TYPE_SEPARATOR, $names);
-    }
-
-    /**
-     * @param string $names
-     * @return array
-     */
-    public function separateNames(string $names): array
-    {
-        $currentPersonNames = $this->separateNamesByType($names);
-
-        return count($currentPersonNames) == 2 ? $currentPersonNames : ["", $currentPersonNames[0]];
-    }
-
-    /**
-     * @param string $localName
-     * @return string
-     */
-    public function getRelationFrom(string $localName): string
-    {
-        $matches = [];
-
-        return preg_match(CharacterDataParser::CURLY_BRACES_PATTERN, $localName, $matches) ? $matches[2] : "";
-    }
-
-    /**
-     * @param string $localName
-     * @return string
-     */
-    public function extractPureNameFrom(string $localName): string
-    {
-        return preg_replace("|\{[^{]*?}|", "", $localName);
-    }
-
-    /**
-     * @param string $path
-     * @return array
-     */
-    public function getNamesFrom(string $path): array
-    {
-        return array_values(
-            array_filter(
-                $this->separateNamesByPath($path)
-            )
-        );
+        return $this->findCharacterOrRelated($this->buildSearchCriteriaFrom($path));
     }
 
     /**
@@ -118,7 +46,7 @@ readonly class CharacterFinder
     {
         if (!empty($criteria->familyName)) {
 
-            return $this->findFamilyMemberByName($criteria->familyName, $criteria->pathWithoutRelations);
+            return $this->findByLastName($criteria->familyName, $criteria->pathWithoutRelations);
         } else {
 
             return $this->findByFirstName($criteria->characterName);
@@ -130,9 +58,9 @@ readonly class CharacterFinder
      * @param string $path
      * @return Character|null
      */
-    public function findFamilyMemberByName(string $lastName, string $path): ?Character
+    public function findByLastName(string $lastName, string $path): ?Character
     {
-        $family = $this->findFamilyByLastName($lastName);
+        $family = $this->findCharactersWithLastName($lastName);
         if (!empty($family)) {
             $names = $this->getNamesIn($path);
             if (count($names) == 2) {
@@ -141,24 +69,6 @@ readonly class CharacterFinder
         }
 
         return !empty($character) ? $character : null;
-    }
-
-    /**
-     * @param string $path
-     * @return string[]
-     */
-    public function getNamesIn(string $path): array
-    {
-        return array_filter($this->separateNamesByPath($path));
-    }
-
-    /**
-     * @param string $tempPathWithoutCurlyBraces
-     * @return string[]
-     */
-    public function separateNamesByPath(string $tempPathWithoutCurlyBraces): array
-    {
-        return explode(self::PATH_SEPARATOR, $tempPathWithoutCurlyBraces);
     }
 
     public function find(string $name): ?Character {
@@ -191,7 +101,7 @@ readonly class CharacterFinder
         return current($child->getParents()) ?? null;
     }
 
-    public function findFamilyByLastName(?string $lastName): array
+    public function findCharactersWithLastName(?string $lastName): array
     {
         $family = array_filter($this->allCharacters, fn(Character $c) => $c->lastName == $lastName);
 
@@ -205,11 +115,106 @@ readonly class CharacterFinder
 
     public function findFamilyByCharacter(string $firstName): array
     {
-        $person = $this->findByFirstName($firstName);
-        if ($person == null) {
+        $character = $this->findByFirstName($firstName);
+        if ($character == null) {
             return [];
         }
 
-        return $person->getParents() + $person->getChildren() + $person->getSiblings();
+        return $character->getParents() + $character->getChildren() + $character->getSiblings();
+    }
+
+    /**
+     * @param string $path
+     * @return CharacterSearchCriteria
+     */
+    private function buildSearchCriteriaFrom(string $path): CharacterSearchCriteria
+    {
+        $characterName = "";
+        $tempPathWithoutModifier = "";
+        $persons = $this->getNamesFrom($path);
+
+        for ($i = count($persons) - 1; $i >= 0; $i--) {
+            [$familyName, $firstName] = $this->separateNames($persons[$i]);
+
+            if ($i == count($persons) - 1) {
+                $relation = $this->getRelationFrom($firstName);
+                $characterName = $this->extractPureNameFrom($firstName);
+            }
+
+            $tempPathWithoutModifier = CharacterFinder::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
+        }
+
+        return new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation, $familyName);
+    }
+
+    /**
+     * @param string $names
+     * @return string[]
+     */
+    private function separateNamesByType(string $names): array
+    {
+        return explode(CharacterDataParser::NAME_TYPE_SEPARATOR, $names);
+    }
+
+    /**
+     * @param string $names
+     * @return array
+     */
+    private function separateNames(string $names): array
+    {
+        $currentPersonNames = $this->separateNamesByType($names);
+
+        return count($currentPersonNames) == 2 ? $currentPersonNames : ["", $currentPersonNames[0]];
+    }
+
+    /**
+     * @param string $localName
+     * @return string
+     */
+    private function getRelationFrom(string $localName): string
+    {
+        $matches = [];
+
+        return preg_match(CharacterDataParser::CURLY_BRACES_PATTERN, $localName, $matches) ? $matches[2] : "";
+    }
+
+    /**
+     * @param string $localName
+     * @return string
+     */
+    private function extractPureNameFrom(string $localName): string
+    {
+        return preg_replace("|\{[^{]*?}|", "", $localName);
+    }
+
+    /**
+     * @param string $path
+     * @return array
+     */
+    private function getNamesFrom(string $path): array
+    {
+        return array_values(
+            array_filter(
+                $this->separateNamesByPath($path)
+            )
+        );
+    }
+
+    /**
+     * @param string $path
+     * @return string[]
+     */
+    private function getNamesIn(string $path): array
+    {
+        return array_filter($this->separateNamesByPath($path));
+    }
+
+    /**
+     * @param string $tempPathWithoutCurlyBraces
+     * @return string[]
+     */
+    private function separateNamesByPath(string $tempPathWithoutCurlyBraces): array
+    {
+        return explode(self::PATH_SEPARATOR, $tempPathWithoutCurlyBraces);
     }
 }

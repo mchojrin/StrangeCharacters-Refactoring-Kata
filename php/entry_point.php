@@ -18,7 +18,7 @@ while (true) {
     if ("exit" === $path) {
         break;
     }
-    $character = CharacterDataParser::findCharacterByPath($path);
+    $character = CharacterDataParser::findCharacterBy($path);
 
     echo "Character: $character".PHP_EOL;
 }

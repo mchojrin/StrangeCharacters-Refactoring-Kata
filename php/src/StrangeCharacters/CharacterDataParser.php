@@ -23,9 +23,9 @@ class CharacterDataParser
         self::completeCharacters($charactersData, $characters);
     }
 
-    public static function findCharacterByPath(string $path): ?Character
+    public static function findCharacterBy(string $path): ?Character
     {
-        return self::$characterFinder->findCharacterOrRelated(self::$characterFinder->buildSearchCriteriaFrom($path));
+        return self::$characterFinder->findByPath($path);
     }
 
     /**
