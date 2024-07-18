@@ -265,7 +265,8 @@ class CharacterDataParser
             $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
         }
 
-        $searchCriteria = new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation ?? "", $hasFamilyName, $familyName ?? "");
+        $searchCriteria = new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation, $familyName);
+
         return $searchCriteria;
     }
 }
