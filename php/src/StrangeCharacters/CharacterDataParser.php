@@ -41,7 +41,7 @@ class CharacterDataParser
             $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
         }
 
-        return self::probablyFindCharacterNemesisAndStuff($hasFamilyName, $familyName ?? "", $tempPathWithoutModifier, $characterName, $modifier);
+        return self::findCharacterOrNemesis($hasFamilyName, $familyName ?? "", $tempPathWithoutModifier, $characterName, $modifier);
     }
 
     private static function createCompleteCharactersFrom(array $allCharactersData): array
@@ -241,7 +241,7 @@ class CharacterDataParser
      * @param string $modifier
      * @return mixed|Character|null
      */
-    protected static function probablyFindCharacterNemesisAndStuff(bool $hasFamilyName, mixed $familyName, string $tempPathWithoutModifier, string $characterName, string $modifier): mixed
+    protected static function findCharacterOrNemesis(bool $hasFamilyName, mixed $familyName, string $tempPathWithoutModifier, string $characterName, string $modifier): mixed
     {
         if ($hasFamilyName) {
             $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
