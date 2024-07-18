@@ -49,7 +49,7 @@ readonly class CharacterFinder
             return $this->findByLastName($criteria->familyName, $criteria->pathWithoutRelations);
         } else {
 
-            return $this->findByFirstName($criteria->characterName);
+            return $this->find($criteria->characterName);
         }
     }
 
@@ -71,10 +71,11 @@ readonly class CharacterFinder
         return !empty($character) ? $character : null;
     }
 
-    public function find(string $name): ?Character {
-        return current(array_filter($this->allCharacters, function (Character $character) use ($name) {
-            return $character->firstName === $name;
-        }));
+    public function find(string $characterName): ?Character
+    {
+        $found = array_filter($this->allCharacters, fn(Character $c) => $c->firstName == $characterName);
+
+        return !empty($found) ? current($found) : null;
     }
 
     public function findInGroup(string $name, array $group): ?Character
@@ -84,16 +85,9 @@ readonly class CharacterFinder
         return !empty($characters) ? current($characters) : null;
     }
 
-    public function findByFirstName(string $characterName): ?Character
-    {
-        $found = array_filter($this->allCharacters, fn(Character $c) => $c->firstName == $characterName);
-
-        return !empty($found) ? current($found) : null;
-    }
-
     public function findParent(string $firstName): ?Character
     {
-        $child = $this->findByFirstName($firstName);
+        $child = $this->find($firstName);
         if ($child == null) {
             return null;
         }
@@ -115,7 +109,7 @@ readonly class CharacterFinder
 
     public function findFamilyByCharacter(string $firstName): array
     {
-        $character = $this->findByFirstName($firstName);
+        $character = $this->find($firstName);
         if ($character == null) {
             return [];
         }

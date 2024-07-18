@@ -13,7 +13,7 @@ class CharacterTest extends TestCase
 {
     #[Test]
     public function findCharacterByFirstName(): void {
-        self::assertEquals("Jim", (new CharacterFinder(CharacterFactory::allTestData()))->findByFirstName("Jim")->firstName);
+        self::assertEquals("Jim", (new CharacterFinder(CharacterFactory::allTestData()))->find("Jim")->firstName);
     }
 
     #[Test]
@@ -74,7 +74,7 @@ class CharacterTest extends TestCase
     #[Test]
     public function FindNothingByName(): void {
         $finder = new CharacterFinder(CharacterFactory::allTestData());
-        self::assertNull($finder->findByFirstName("George$"));
+        self::assertNull($finder->find("George$"));
     }
 
     #[Test]
