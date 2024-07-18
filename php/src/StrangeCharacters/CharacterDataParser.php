@@ -25,7 +25,7 @@ class CharacterDataParser
         $hasFamilyName = false;
         $characterName = "";
         $tempPathWithoutModifier = "";
-        $modifier = "";
+        $relation = "";
         $persons = self::getPersonsFrom($path);
 
         for ($i = count($persons) - 1; $i >= 0; $i--) {
@@ -34,14 +34,14 @@ class CharacterDataParser
             $hasFamilyName = $hasFamilyName || !empty($familyName);
 
             if ($i == count($persons) - 1) {
-                $modifier = self::getModifierFrom($firstName);
+                $relation = self::getModifierFrom($firstName);
                 $characterName = self::removeModifierFrom($firstName);
             }
 
             $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
         }
 
-        return self::findCharacterOrNemesis($hasFamilyName, $familyName ?? "", $tempPathWithoutModifier, $characterName, $modifier);
+        return self::findCharacterOrRelated($hasFamilyName, $familyName ?? "", $tempPathWithoutModifier, $characterName, $relation);
     }
 
     private static function createCompleteCharactersFrom(array $allCharactersData): array
@@ -241,7 +241,7 @@ class CharacterDataParser
      * @param string $modifier
      * @return mixed|Character|null
      */
-    protected static function findCharacterOrNemesis(bool $hasFamilyName, mixed $familyName, string $tempPathWithoutModifier, string $characterName, string $modifier): mixed
+    protected static function findCharacterOrRelated(bool $hasFamilyName, mixed $familyName, string $tempPathWithoutModifier, string $characterName, string $modifier): mixed
     {
         if ($hasFamilyName) {
             $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
