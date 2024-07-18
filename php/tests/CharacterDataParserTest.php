@@ -8,44 +8,45 @@ use StrangeCharacters\CharacterDataParser;
 
 class CharacterDataParserTest extends TestCase
 {
+    private readonly CharacterDataParser $parser;
+
+    protected function setUp(): void
+    {
+        $this->parser = new CharacterDataParser() ;
+    }
+
     #[Test]
     public function findCharacterByPath() {
-        $parser = new CharacterDataParser();
-        self::assertEquals("Eleven", $parser->findByPath("/Jim/Eleven")->firstName);
+        self::assertEquals("Eleven", $this->parser->findByPath("/Jim/Eleven")->firstName);
     }
 
     #[Test]
     public function findCharacterByEmptyPath(): void
     {
-        $parser = new CharacterDataParser();
-        self::assertNull($parser->findByPath(""));
+        self::assertNull($this->parser->findByPath(""));
     }
 
     #[Test]
     public function FindCharacterByPathWithFamilyName(): void
     {
-        $parser = new CharacterDataParser();
-        self::assertEquals("Nancy", $parser->findByPath("/Wheeler:Karen/Wheeler:Nancy")->firstName);
+        self::assertEquals("Nancy", $this->parser->findByPath("/Wheeler:Karen/Wheeler:Nancy")->firstName);
     }
 
     #[Test]
     public function FindNemesisByPath(): void
     {
-        $parser = new CharacterDataParser();
-        self::assertEquals("Mindflayer", $parser->findByPath("/Joyce/Will{Nemesis}")->firstName);
+        self::assertEquals("Mindflayer", $this->parser->findByPath("/Joyce/Will{Nemesis}")->firstName);
     }
 
     #[Test]
     public function FindNemesisByPathAndFamilyName(): void
     {
-        $parser = new CharacterDataParser();
-        self::assertNull($parser->findByPath("/Wheeler:Karen/Wheeler:Nancy{Nemesis}"));
+        self::assertNull($this->parser->findByPath("/Wheeler:Karen/Wheeler:Nancy{Nemesis}"));
     }
 
     #[Test]
     public function FindNothingByPathAndFamilyName(): void
     {
-        $parser = new CharacterDataParser();
-        self::assertNull($parser->findByPath("/Wheeler:Karen/Wheeler:George"));
+        self::assertNull($this->parser->findByPath("/Wheeler:Karen/Wheeler:George"));
     }
 }
