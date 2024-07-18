@@ -220,14 +220,13 @@ class CharacterDataParser
      */
     protected static function findCharacterOrRelated(CharacterSearchCriteria $criteria): ?Character
     {
-        $character = self::extracted($criteria);
+        $mainCharacter = self::findMainCharacter($criteria);
 
-        if (!empty($character)) {
-
-            return $criteria->relation == "Nemesis" ? $character->getNemesis() : $character;
+        if (empty($mainCharacter)) {
+            return null;
         }
 
-        return null;
+        return $criteria->relation == "Nemesis" ? $mainCharacter->getNemesis() : $mainCharacter;
     }
 
     /**
@@ -256,9 +255,9 @@ class CharacterDataParser
 
     /**
      * @param CharacterSearchCriteria $criteria
-     * @return array
+     * @return Character|null
      */
-    protected static function extracted(CharacterSearchCriteria $criteria): ?Character
+    protected static function findMainCharacter(CharacterSearchCriteria $criteria): ?Character
     {
         if (!empty($criteria->familyName)) {
             $familyMembers = self::$characterFinder->findFamilyByLastName($criteria->familyName);
@@ -266,13 +265,13 @@ class CharacterDataParser
                 $relatives = self::getPersonsIn($criteria->pathWithoutRelations);
                 if (count($relatives) == 2) {
                     $relativesNamedFirstName = self::findRelativesNamed(next($relatives), $familyMembers);
-                    $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
                 }
             }
-        } else {
-            $character = self::$characterFinder->findByFirstName($criteria->characterName);
-        }
 
-        return $character;
+            return !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
+        } else {
+
+            return self::$characterFinder->findByFirstName($criteria->characterName);
+        }
     }
 }
