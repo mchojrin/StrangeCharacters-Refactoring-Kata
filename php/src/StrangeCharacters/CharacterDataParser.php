@@ -10,7 +10,6 @@ use function current;
 
 class CharacterDataParser
 {
-    const string PATH_SEPARATOR = "/";
     const string NAME_TYPE_SEPARATOR = ":";
     const string CURLY_BRACES_PATTERN = "|(.*)\{([^{]*)}|";
     const string DEFAULT_INPUT_FILENAME = ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json";
@@ -154,15 +153,6 @@ class CharacterDataParser
     }
 
     /**
-     * @param string $tempPathWithoutCurlyBraces
-     * @return string[]
-     */
-    private static function separateNamesByPath(string $tempPathWithoutCurlyBraces): array
-    {
-        return explode(self::PATH_SEPARATOR, $tempPathWithoutCurlyBraces);
-    }
-
-    /**
      * @param string $names
      * @return string[]
      */
@@ -177,7 +167,7 @@ class CharacterDataParser
      */
     private static function getNamesIn(string $path): array
     {
-        return array_filter(self::separateNamesByPath($path));
+        return array_filter(CharacterFinder::separateNamesByPath($path));
     }
 
     /**
@@ -199,7 +189,7 @@ class CharacterDataParser
     {
         return array_values(
             array_filter(
-                self::separateNamesByPath($path)
+                CharacterFinder::separateNamesByPath($path)
             )
         );
     }
@@ -237,7 +227,7 @@ class CharacterDataParser
                 $characterName = self::extractPureNameFrom($firstName);
             }
 
-            $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
+            $tempPathWithoutModifier = CharacterFinder::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
         }
 
         return new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation, $familyName);

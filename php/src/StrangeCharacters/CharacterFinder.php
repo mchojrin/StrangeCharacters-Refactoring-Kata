@@ -9,11 +9,22 @@ use function current;
 
 readonly class CharacterFinder
 {
+    public const string PATH_SEPARATOR = "/";
+
     /**
      * @param array<Character> $allCharacters
      */
     public function __construct(private array $allCharacters)
     {
+    }
+
+    /**
+     * @param string $tempPathWithoutCurlyBraces
+     * @return string[]
+     */
+    public static function separateNamesByPath(string $tempPathWithoutCurlyBraces): array
+    {
+        return explode(self::PATH_SEPARATOR, $tempPathWithoutCurlyBraces);
     }
 
     public function find(string $name): ?Character {
