@@ -10,6 +10,8 @@ use function current;
 readonly class CharacterFinder
 {
     public const string PATH_SEPARATOR = "/";
+    public const string CURLY_BRACES_PATTERN = "|(.*)\{([^{]*)}|";
+    public const string NAME_TYPE_SEPARATOR = ":";
 
     /**
      * @param array<Character> $allCharacters
@@ -147,7 +149,7 @@ readonly class CharacterFinder
      */
     private function separateNamesByType(string $names): array
     {
-        return explode(CharacterDataParser::NAME_TYPE_SEPARATOR, $names);
+        return explode(self::NAME_TYPE_SEPARATOR, $names);
     }
 
     /**
@@ -169,7 +171,7 @@ readonly class CharacterFinder
     {
         $matches = [];
 
-        return preg_match(CharacterDataParser::CURLY_BRACES_PATTERN, $localName, $matches) ? $matches[2] : "";
+        return preg_match(self::CURLY_BRACES_PATTERN, $localName, $matches) ? $matches[2] : "";
     }
 
     /**

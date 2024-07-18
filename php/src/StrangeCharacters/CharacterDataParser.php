@@ -10,14 +10,12 @@ use function current;
 
 class CharacterDataParser
 {
-    const string NAME_TYPE_SEPARATOR = ":";
-    const string CURLY_BRACES_PATTERN = "|(.*)\{([^{]*)}|";
     const string DEFAULT_INPUT_FILENAME = ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json";
     private static CharacterFinder $characterFinder;
 
     public static function initWithDataFrom(?string $filename): void
     {
-        $charactersData = self::getAllCharactersDataFrom($filename ?? self::DEFAULT_INPUT_FILENAME);
+        $charactersData = self::readCharactersDataFrom($filename ?? self::DEFAULT_INPUT_FILENAME);
         $characters = self::buildCharactersFrom($charactersData);
         self::$characterFinder = new CharacterFinder($characters);
         self::completeCharacters($charactersData, $characters);
@@ -118,7 +116,7 @@ class CharacterDataParser
      * @param string $filename
      * @return mixed
      */
-    private static function getAllCharactersDataFrom(string $filename): mixed
+    private static function readCharactersDataFrom(string $filename): mixed
     {
         return json_decode(file_get_contents($filename), false);
     }
