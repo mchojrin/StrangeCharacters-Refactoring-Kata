@@ -6,11 +6,8 @@ namespace StrangeCharacters;
 
 readonly class CharacterFinder
 {
-    private array $allCharacters;
-
-    public function __construct(array $allCharacters)
+    public function __construct(private array $allCharacters)
     {
-        $this->allCharacters = $allCharacters;
     }
 
     public static function findCharacter(string $name, array $characters): ?Character
