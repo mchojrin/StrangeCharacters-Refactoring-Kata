@@ -232,28 +232,11 @@ class CharacterDataParser
     {
         if (!empty($criteria->familyName)) {
 
-            return self::findFamilyMemberByName($criteria->familyName, $criteria->pathWithoutRelations);
+            return self::$characterFinder->findFamilyMemberByName($criteria->familyName, $criteria->pathWithoutRelations);
         } else {
 
             return self::$characterFinder->findByFirstName($criteria->characterName);
         }
     }
 
-    /**
-     * @param string $lastName
-     * @param string $path
-     * @return Character|null
-     */
-    private static function findFamilyMemberByName(string $lastName, string $path): ?Character
-    {
-        $family = self::$characterFinder->findFamilyByLastName($lastName);
-        if (!empty($family)) {
-            $names = self::$characterFinder->getNamesIn($path);
-            if (count($names) == 2) {
-                $character = self::$characterFinder->findInGroup(next($names), $family);
-            }
-        }
-
-        return !empty($character) ? $character : null;
-    }
 }

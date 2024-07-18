@@ -19,6 +19,24 @@ readonly class CharacterFinder
     }
 
     /**
+     * @param string $lastName
+     * @param string $path
+     * @return Character|null
+     */
+    public function findFamilyMemberByName(string $lastName, string $path): ?Character
+    {
+        $family = $this->findFamilyByLastName($lastName);
+        if (!empty($family)) {
+            $names = $this->getNamesIn($path);
+            if (count($names) == 2) {
+                $character = $this->findInGroup(next($names), $family);
+            }
+        }
+
+        return !empty($character) ? $character : null;
+    }
+
+    /**
      * @param string $path
      * @return string[]
      */
