@@ -25,7 +25,7 @@ class CharacterDataParser
 
     public static function findCharacterByPath(string $path): ?Character
     {
-        return self::findCharacterOrRelated(self::buildSearchCriteriaFrom($path));
+        return self::$characterFinder->findCharacterOrRelated(self::buildSearchCriteriaFrom($path));
     }
 
     private static function createCompleteCharactersFrom(array $allCharactersData): array
@@ -183,21 +183,6 @@ class CharacterDataParser
                 self::$characterFinder->separateNamesByPath($path)
             )
         );
-    }
-
-    /**
-     * @param CharacterSearchCriteria $criteria
-     * @return Character|null
-     */
-    private static function findCharacterOrRelated(CharacterSearchCriteria $criteria): ?Character
-    {
-        $mainCharacter = self::$characterFinder->findMainCharacter($criteria);
-
-        if (empty($mainCharacter)) {
-            return null;
-        }
-
-        return $criteria->relation == "Nemesis" ? $mainCharacter->getNemesis() : $mainCharacter;
     }
 
     /**

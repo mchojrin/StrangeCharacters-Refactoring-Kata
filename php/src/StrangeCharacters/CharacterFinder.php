@@ -22,6 +22,21 @@ readonly class CharacterFinder
      * @param CharacterSearchCriteria $criteria
      * @return Character|null
      */
+    public function findCharacterOrRelated(CharacterSearchCriteria $criteria): ?Character
+    {
+        $mainCharacter = $this->findMainCharacter($criteria);
+
+        if (empty($mainCharacter)) {
+            return null;
+        }
+
+        return $criteria->relation == "Nemesis" ? $mainCharacter->getNemesis() : $mainCharacter;
+    }
+
+    /**
+     * @param CharacterSearchCriteria $criteria
+     * @return Character|null
+     */
     public function findMainCharacter(CharacterSearchCriteria $criteria): ?Character
     {
         if (!empty($criteria->familyName)) {
