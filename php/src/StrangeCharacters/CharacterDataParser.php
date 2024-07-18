@@ -136,17 +136,6 @@ class CharacterDataParser
      * @param string $localName
      * @return string
      */
-    private static function getRelationFrom(string $localName): string
-    {
-        $matches = [];
-
-        return preg_match(self::CURLY_BRACES_PATTERN, $localName, $matches) ? $matches[2] : "";
-    }
-
-    /**
-     * @param string $localName
-     * @return string
-     */
     private static function extractPureNameFrom(string $localName): string
     {
         return preg_replace("|\{[^{]*?}|", "", $localName);
@@ -166,7 +155,7 @@ class CharacterDataParser
             [$familyName, $firstName] = CharacterFinder::separateNames($persons[$i]);
 
             if ($i == count($persons) - 1) {
-                $relation = self::getRelationFrom($firstName);
+                $relation = CharacterFinder::getRelationFrom($firstName);
                 $characterName = self::extractPureNameFrom($firstName);
             }
 

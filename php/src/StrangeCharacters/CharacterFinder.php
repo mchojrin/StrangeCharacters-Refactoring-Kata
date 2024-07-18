@@ -39,6 +39,17 @@ readonly class CharacterFinder
     }
 
     /**
+     * @param string $localName
+     * @return string
+     */
+    public static function getRelationFrom(string $localName): string
+    {
+        $matches = [];
+
+        return preg_match(CharacterDataParser::CURLY_BRACES_PATTERN, $localName, $matches) ? $matches[2] : "";
+    }
+
+    /**
      * @param string $path
      * @return array
      */
