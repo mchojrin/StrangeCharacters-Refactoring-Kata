@@ -182,12 +182,12 @@ class CharacterDataParser
     }
 
     /**
-     * @param string $tempPathWithoutCurlyBraces
+     * @param string $path
      * @return string[]
      */
-    protected static function getPersonsIn(string $tempPathWithoutCurlyBraces): array
+    protected static function getPersonsIn(string $path): array
     {
-        return array_filter(self::separatePersonsByPath($tempPathWithoutCurlyBraces));
+        return array_filter(self::separatePersonsByPath($path));
     }
 
     /**
@@ -220,18 +220,7 @@ class CharacterDataParser
      */
     protected static function findCharacterOrRelated(CharacterSearchCriteria $criteria): ?Character
     {
-        if (!empty($criteria->familyName)) {
-            $familyMembers = self::$characterFinder->findFamilyByLastName($criteria->familyName);
-            if (!empty($familyMembers)) {
-                $personsWithoutCurlyBraces = self::getPersonsIn($criteria->tempPathWithoutModifier);
-                if (count($personsWithoutCurlyBraces) == 2) {
-                    $relativesNamedFirstName = self::findRelativesNamed(next($personsWithoutCurlyBraces), $familyMembers);
-                    $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
-                }
-            }
-        } else {
-            $character = self::$characterFinder->findByFirstName($criteria->characterName);
-        }
+        $character = self::extracted($criteria);
 
         if (!empty($character)) {
 
@@ -263,5 +252,27 @@ class CharacterDataParser
         }
 
         return new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation, $familyName);
+    }
+
+    /**
+     * @param CharacterSearchCriteria $criteria
+     * @return array
+     */
+    protected static function extracted(CharacterSearchCriteria $criteria): ?Character
+    {
+        if (!empty($criteria->familyName)) {
+            $familyMembers = self::$characterFinder->findFamilyByLastName($criteria->familyName);
+            if (!empty($familyMembers)) {
+                $relatives = self::getPersonsIn($criteria->pathWithoutRelations);
+                if (count($relatives) == 2) {
+                    $relativesNamedFirstName = self::findRelativesNamed(next($relatives), $familyMembers);
+                    $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
+                }
+            }
+        } else {
+            $character = self::$characterFinder->findByFirstName($criteria->characterName);
+        }
+
+        return $character;
     }
 }
