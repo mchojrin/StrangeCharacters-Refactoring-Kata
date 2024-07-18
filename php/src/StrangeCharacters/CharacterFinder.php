@@ -22,7 +22,7 @@ readonly class CharacterFinder
      * @param string $names
      * @return string[]
      */
-    public static function separateNamesByType(string $names): array
+    public function separateNamesByType(string $names): array
     {
         return explode(CharacterDataParser::NAME_TYPE_SEPARATOR, $names);
     }
@@ -31,9 +31,9 @@ readonly class CharacterFinder
      * @param string $names
      * @return array
      */
-    public static function separateNames(string $names): array
+    public function separateNames(string $names): array
     {
-        $currentPersonNames = CharacterFinder::separateNamesByType($names);
+        $currentPersonNames = $this->separateNamesByType($names);
 
         return count($currentPersonNames) == 2 ? $currentPersonNames : ["", $currentPersonNames[0]];
     }
