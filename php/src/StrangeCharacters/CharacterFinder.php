@@ -19,6 +19,30 @@ readonly class CharacterFinder
     }
 
     /**
+     * @param string $path
+     * @return CharacterSearchCriteria
+     */
+    public function buildSearchCriteriaFrom(string $path): CharacterSearchCriteria
+    {
+        $characterName = "";
+        $tempPathWithoutModifier = "";
+        $persons = $this->getNamesFrom($path);
+
+        for ($i = count($persons) - 1; $i >= 0; $i--) {
+            [$familyName, $firstName] = $this->separateNames($persons[$i]);
+
+            if ($i == count($persons) - 1) {
+                $relation = $this->getRelationFrom($firstName);
+                $characterName = $this->extractPureNameFrom($firstName);
+            }
+
+            $tempPathWithoutModifier = CharacterFinder::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
+        }
+
+        return new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation, $familyName);
+    }
+
+    /**
      * @param string $names
      * @return string[]
      */

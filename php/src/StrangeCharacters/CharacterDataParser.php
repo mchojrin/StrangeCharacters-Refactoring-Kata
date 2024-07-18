@@ -25,7 +25,7 @@ class CharacterDataParser
 
     public static function findCharacterByPath(string $path): ?Character
     {
-        return self::$characterFinder->findCharacterOrRelated(self::buildSearchCriteriaFrom($path));
+        return self::$characterFinder->findCharacterOrRelated(self::$characterFinder->buildSearchCriteriaFrom($path));
     }
 
     private static function createCompleteCharactersFrom(array $allCharactersData): array
@@ -130,30 +130,6 @@ class CharacterDataParser
     private static function getAllCharactersDataFrom(string $filename): mixed
     {
         return json_decode(file_get_contents($filename), false);
-    }
-
-    /**
-     * @param string $path
-     * @return CharacterSearchCriteria
-     */
-    private static function buildSearchCriteriaFrom(string $path): CharacterSearchCriteria
-    {
-        $characterName = "";
-        $tempPathWithoutModifier = "";
-        $persons = self::$characterFinder->getNamesFrom($path);
-
-        for ($i = count($persons) - 1; $i >= 0; $i--) {
-            [$familyName, $firstName] = self::$characterFinder->separateNames($persons[$i]);
-
-            if ($i == count($persons) - 1) {
-                $relation = self::$characterFinder->getRelationFrom($firstName);
-                $characterName = self::$characterFinder->extractPureNameFrom($firstName);
-            }
-
-            $tempPathWithoutModifier = CharacterFinder::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
-        }
-
-        return new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation, $familyName);
     }
 
 }
