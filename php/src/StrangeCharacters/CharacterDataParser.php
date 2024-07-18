@@ -28,15 +28,6 @@ class CharacterDataParser
         return self::$characterFinder->findCharacterOrRelated(self::$characterFinder->buildSearchCriteriaFrom($path));
     }
 
-    private static function createCompleteCharactersFrom(array $allCharactersData): array
-    {
-        $allCharacters = self::buildCharactersFrom($allCharactersData);
-
-        self::completeCharacters($allCharactersData, $allCharacters);
-
-        return $allCharacters;
-    }
-
     /**
      * @param array $data
      * @return array
