@@ -147,20 +147,10 @@ class CharacterDataParser
     }
 
     /**
-     * @param string $firstName
-     * @param array $familyMembers
-     * @return array
-     */
-    private static function findRelativesNamed(string $firstName, array $familyMembers): array
-    {
-        return array_filter($familyMembers, fn(Character $c) => ($c->firstName == $firstName));
-    }
-
-    /**
      * @param string $tempPathWithoutCurlyBraces
      * @return string[]
      */
-    private static function separatePersonsByPath(string $tempPathWithoutCurlyBraces): array
+    private static function separateNamesByPath(string $tempPathWithoutCurlyBraces): array
     {
         return explode(self::PATH_SEPARATOR, $tempPathWithoutCurlyBraces);
     }
@@ -178,9 +168,9 @@ class CharacterDataParser
      * @param string $path
      * @return string[]
      */
-    private static function getPersonsIn(string $path): array
+    private static function getNamesIn(string $path): array
     {
-        return array_filter(self::separatePersonsByPath($path));
+        return array_filter(self::separateNamesByPath($path));
     }
 
     /**
@@ -198,11 +188,11 @@ class CharacterDataParser
      * @param string $path
      * @return array
      */
-    private static function getPersonsFrom(string $path): array
+    private static function getNamesFrom(string $path): array
     {
         return array_values(
             array_filter(
-                self::separatePersonsByPath($path)
+                self::separateNamesByPath($path)
             )
         );
     }
@@ -230,7 +220,7 @@ class CharacterDataParser
     {
         $characterName = "";
         $tempPathWithoutModifier = "";
-        $persons = self::getPersonsFrom($path);
+        $persons = self::getNamesFrom($path);
 
         for ($i = count($persons) - 1; $i >= 0; $i--) {
             [$familyName, $firstName] = self::separateNames($persons[$i]);
@@ -270,9 +260,9 @@ class CharacterDataParser
     {
         $familyMembers = self::$characterFinder->findFamilyByLastName($lastName);
         if (!empty($familyMembers)) {
-            $relativeNames = self::getPersonsIn($path);
+            $relativeNames = self::getNamesIn($path);
             if (count($relativeNames) == 2) {
-                $relativesNamedFirstName = self::findRelativesNamed(next($relativeNames), $familyMembers);
+                $relativesNamedFirstName = CharacterFinder::findRelativesNamed(next($relativeNames), $familyMembers);
             }
         }
 

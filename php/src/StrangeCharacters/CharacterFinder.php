@@ -20,6 +20,16 @@ readonly class CharacterFinder
         }));
     }
 
+    /**
+     * @param string $firstName
+     * @param array $familyMembers
+     * @return array
+     */
+    public static function findRelativesNamed(string $firstName, array $familyMembers): array
+    {
+        return array_filter($familyMembers, fn(Character $c) => ($c->firstName == $firstName));
+    }
+
     public function findByFirstName(string $characterName): ?Character
     {
         $found = array_filter($this->allCharacters, fn(Character $c) => $c->firstName == $characterName);
