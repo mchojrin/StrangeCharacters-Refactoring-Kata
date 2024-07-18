@@ -8,7 +8,6 @@ require __DIR__ . '/vendor/autoload.php';
 
 $filename = $argc > 1 ? $argv[1] : ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json";
 echo "Using character file: $filename" . PHP_EOL;
-//CharacterDataParser::initWithDataFrom($filename);
 $parser = new CharacterDataParser($filename);
 
 while (true) {
