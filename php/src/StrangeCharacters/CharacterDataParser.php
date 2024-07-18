@@ -260,18 +260,27 @@ class CharacterDataParser
     protected static function findMainCharacter(CharacterSearchCriteria $criteria): ?Character
     {
         if (!empty($criteria->familyName)) {
-            $familyMembers = self::$characterFinder->findFamilyByLastName($criteria->familyName);
-            if (!empty($familyMembers)) {
-                $relatives = self::getPersonsIn($criteria->pathWithoutRelations);
-                if (count($relatives) == 2) {
-                    $relativesNamedFirstName = self::findRelativesNamed(next($relatives), $familyMembers);
-                }
-            }
-
-            return !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
+            return self::getFamilyMemberByName($criteria->familyName, $criteria->pathWithoutRelations);
         } else {
 
             return self::$characterFinder->findByFirstName($criteria->characterName);
         }
+    }
+
+    /**
+     * @param CharacterSearchCriteria $criteria
+     * @return false|mixed|null
+     */
+    protected static function getFamilyMemberByName(string $lastName, string $path): mixed
+    {
+        $familyMembers = self::$characterFinder->findFamilyByLastName($lastName);
+        if (!empty($familyMembers)) {
+            $relativeNames = self::getPersonsIn($path);
+            if (count($relativeNames) == 2) {
+                $relativesNamedFirstName = self::findRelativesNamed(next($relativeNames), $familyMembers);
+            }
+        }
+
+        return !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
     }
 }
