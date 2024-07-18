@@ -14,8 +14,8 @@ class CharacterDataParser
 
     public function __construct(readonly ?string $filename = self::DEFAULT_INPUT_FILENAME)
     {
-        $charactersData = $this->readFrom($filename);
-        $characters = $this->buildFrom($charactersData);
+        $charactersData = $this->readCharactersDataFrom($filename);
+        $characters = $this->buildCharacterCollectionFrom($charactersData);
         $this->finder = new CharacterFinder($characters);
         $this->complete($charactersData, $characters);
     }
@@ -25,7 +25,7 @@ class CharacterDataParser
         return $this->finder->findByPath($path);
     }
 
-    private function buildFrom(array $data): array
+    private function buildCharacterCollectionFrom(array $data): array
     {
         return $this->buildCharactersFrom($data);
     }
@@ -88,10 +88,6 @@ class CharacterDataParser
         }
     }
 
-    private function readFrom(string $filename): array
-    {
-        return $this->readCharactersDataFrom($filename);
-    }
     /**
      * @param string $filename
      * @return array
