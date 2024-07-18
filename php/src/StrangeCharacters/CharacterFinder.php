@@ -19,6 +19,21 @@ readonly class CharacterFinder
     }
 
     /**
+     * @param CharacterSearchCriteria $criteria
+     * @return Character|null
+     */
+    public function findMainCharacter(CharacterSearchCriteria $criteria): ?Character
+    {
+        if (!empty($criteria->familyName)) {
+
+            return $this->findFamilyMemberByName($criteria->familyName, $criteria->pathWithoutRelations);
+        } else {
+
+            return $this->findByFirstName($criteria->characterName);
+        }
+    }
+
+    /**
      * @param string $lastName
      * @param string $path
      * @return Character|null

@@ -191,7 +191,7 @@ class CharacterDataParser
      */
     private static function findCharacterOrRelated(CharacterSearchCriteria $criteria): ?Character
     {
-        $mainCharacter = self::findMainCharacter($criteria);
+        $mainCharacter = self::$characterFinder->findMainCharacter($criteria);
 
         if (empty($mainCharacter)) {
             return null;
@@ -222,21 +222,6 @@ class CharacterDataParser
         }
 
         return new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation, $familyName);
-    }
-
-    /**
-     * @param CharacterSearchCriteria $criteria
-     * @return Character|null
-     */
-    private static function findMainCharacter(CharacterSearchCriteria $criteria): ?Character
-    {
-        if (!empty($criteria->familyName)) {
-
-            return self::$characterFinder->findFamilyMemberByName($criteria->familyName, $criteria->pathWithoutRelations);
-        } else {
-
-            return self::$characterFinder->findByFirstName($criteria->characterName);
-        }
     }
 
 }
