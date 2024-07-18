@@ -5,13 +5,21 @@ declare(strict_types=1);
 namespace StrangeCharacters;
 
 use stdClass;
-use function array_filter;
-use function current;
 
 class CharacterDataParser
 {
     const string DEFAULT_INPUT_FILENAME = ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json";
     private static CharacterFinder $characterFinder;
+
+    private readonly CharacterFinder $finder;
+
+    public function __construct()
+    {
+        $charactersData = $this->readFrom($filename ?? self::DEFAULT_INPUT_FILENAME);
+        $characters = $this->buildFrom($charactersData);
+        $this->finder = new CharacterFinder($characters);
+        self::completeCharacters($charactersData, $characters);
+    }
 
     public static function initWithDataFrom(?string $filename): void
     {
@@ -26,6 +34,10 @@ class CharacterDataParser
         return self::$characterFinder->findByPath($path);
     }
 
+    private function buildFrom(array $data): array
+    {
+        return self::buildCharactersFrom($data);
+    }
     /**
      * @param array $data
      * @return array
@@ -42,16 +54,15 @@ class CharacterDataParser
      */
     private static function completeCharacter(stdClass $characterData, array $characters): void
     {
-        self::addNemesis($characterData, $characters);
+        self::addNemesis($characterData);
         self::addFamily($characterData, $characters);
     }
 
     /**
      * @param stdClass $characterData
-     * @param array $characters
      * @return void
      */
-    private static function addNemesis(stdClass $characterData, array $characters): void
+    private static function addNemesis(stdClass $characterData): void
     {
         if (!empty($characterData->Nemesis)) {
             $character = self::$characterFinder->find($characterData->FirstName);
@@ -92,12 +103,11 @@ class CharacterDataParser
      */
     private static function addChild(Character $character, string $childName, array $characters): void
     {
-        $name1 = $childName;
-        $child = current(array_filter($characters, function (Character $character) use ($name1) {
-            return $character->firstName === $name1;
-        }));
-        if ($child != null)
+        $child = self::$characterFinder->findChild($characters, $childName);
+
+        if ($child != null) {
             $character->addChild($child);
+        }
     }
 
     /**
@@ -112,11 +122,15 @@ class CharacterDataParser
         }
     }
 
+    private function readFrom(string $filename): array
+    {
+        return self::readCharactersDataFrom($filename);
+    }
     /**
      * @param string $filename
-     * @return mixed
+     * @return array
      */
-    private static function readCharactersDataFrom(string $filename): mixed
+    private static function readCharactersDataFrom(string $filename): array
     {
         return json_decode(file_get_contents($filename), false);
     }

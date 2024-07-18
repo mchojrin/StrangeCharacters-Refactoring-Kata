@@ -20,6 +20,18 @@ readonly class CharacterFinder
     {
     }
 
+    /**
+     * @param array $characters
+     * @param string $childName
+     * @return false|mixed
+     */
+    public function findChild(array $characters, string $childName): mixed
+    {
+        return current(array_filter($characters, function (Character $character) use ($childName) {
+            return $character->firstName === $childName;
+        }));
+    }
+
     public function find(string $characterName): ?Character
     {
         $found = array_filter($this->allCharacters, fn(Character $c) => $c->firstName == $characterName);
