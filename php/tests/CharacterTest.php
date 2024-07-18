@@ -19,7 +19,7 @@ class CharacterTest extends TestCase
     #[Test]
     public function FindElevenByLastName(): void {
         $finder = new CharacterFinder(CharacterFactory::allTestData());
-        $family = $finder->findCharactersWithLastName(null);
+        $family = $finder->findFamily(null);
         self::assertEquals("Eleven", current($family)->firstName);
     }
 
@@ -60,7 +60,7 @@ class CharacterTest extends TestCase
     #[Test]
     public function FindFamilyByLastName(): void {
         $finder = new CharacterFinder(CharacterFactory::allTestData());
-        $familyNames = array_map(fn(Character $character) => [$character->firstName, $character->lastName], $finder->findCharactersWithLastName("Wheeler"));
+        $familyNames = array_map(fn(Character $character) => [$character->firstName, $character->lastName], $finder->findFamily("Wheeler"));
         foreach ( [
             ["Mike", "Wheeler"],
             ["Nancy", "Wheeler"],

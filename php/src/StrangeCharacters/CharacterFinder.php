@@ -46,28 +46,13 @@ readonly class CharacterFinder
     }
 
     /**
-     * @param CharacterSearchCriteria $criteria
-     * @return Character|null
-     */
-    public function findMainCharacter(CharacterSearchCriteria $criteria): ?Character
-    {
-        if (!empty($criteria->familyName)) {
-
-            return $this->findByLastName($criteria->familyName, $criteria->pathWithoutRelations);
-        } else {
-
-            return $this->find($criteria->characterName);
-        }
-    }
-
-    /**
      * @param string $lastName
      * @param string $path
      * @return Character|null
      */
     public function findByLastName(string $lastName, string $path): ?Character
     {
-        $family = $this->findCharactersWithLastName($lastName);
+        $family = $this->findFamily($lastName);
         if (!empty($family)) {
             $names = $this->getNamesIn($path);
             if (count($names) == 2) {
@@ -76,13 +61,6 @@ readonly class CharacterFinder
         }
 
         return !empty($character) ? $character : null;
-    }
-
-    public function find(string $characterName): ?Character
-    {
-        $found = array_filter($this->allCharacters, fn(Character $c) => $c->firstName == $characterName);
-
-        return !empty($found) ? current($found) : null;
     }
 
     public function findInGroup(string $name, array $group): ?Character
@@ -102,7 +80,7 @@ readonly class CharacterFinder
         return current($child->getParents()) ?? null;
     }
 
-    public function findCharactersWithLastName(?string $lastName): array
+    public function findFamily(?string $lastName): array
     {
         $family = array_filter($this->allCharacters, fn(Character $c) => $c->lastName == $lastName);
 
@@ -122,6 +100,21 @@ readonly class CharacterFinder
         }
 
         return $character->getParents() + $character->getChildren() + $character->getSiblings();
+    }
+
+    /**
+     * @param CharacterSearchCriteria $criteria
+     * @return Character|null
+     */
+    private function findMainCharacter(CharacterSearchCriteria $criteria): ?Character
+    {
+        if (!empty($criteria->familyName)) {
+
+            return $this->findByLastName($criteria->familyName, $criteria->pathWithoutRelations);
+        } else {
+
+            return $this->find($criteria->characterName);
+        }
     }
 
     /**
