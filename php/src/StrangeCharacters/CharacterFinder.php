@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace StrangeCharacters;
 
+use function array_filter;
+use function current;
+
 readonly class CharacterFinder
 {
+    /**
+     * @param array<Character> $allCharacters
+     */
     public function __construct(private array $allCharacters)
     {
     }
 
-    public static function findCharacter(string $name, array $characters): ?Character
-    {
-        return current(array_filter($characters, function (Character $character) use ($name) {
+    public function find(string $name): ?Character {
+        return current(array_filter($this->allCharacters, function (Character $character) use ($name) {
             return $character->firstName === $name;
         }));
     }

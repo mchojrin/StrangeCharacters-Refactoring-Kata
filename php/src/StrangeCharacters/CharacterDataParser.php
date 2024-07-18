@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace StrangeCharacters;
 
 use stdClass;
+use function array_filter;
+use function current;
 
 class CharacterDataParser
 {
@@ -16,11 +18,10 @@ class CharacterDataParser
 
     public static function initWithDataFrom(?string $filename): void
     {
-        self::$characterFinder = new CharacterFinder(
-            self::createCompleteCharactersFrom(
-                self::getAllCharactersDataFrom($filename ?? self::DEFAULT_INPUT_FILENAME)
-            )
-        );
+        $charactersData = self::getAllCharactersDataFrom($filename ?? self::DEFAULT_INPUT_FILENAME);
+        $characters = self::buildCharactersFrom($charactersData);
+        self::$characterFinder = new CharacterFinder($characters);
+        self::completeCharacters($charactersData, $characters);
     }
 
     public static function findCharacterByPath(string $path): ?Character
@@ -65,8 +66,8 @@ class CharacterDataParser
     private static function addNemesis(stdClass $characterData, array $characters): void
     {
         if (!empty($characterData->Nemesis)) {
-            $character = CharacterFinder::findCharacter($characterData->FirstName, $characters);
-            $character->setNemesis(CharacterFinder::findCharacter($characterData->Nemesis, $characters));
+            $character = self::$characterFinder->find($characterData->FirstName);
+            $character->setNemesis(self::$characterFinder->find($characterData->Nemesis));
         }
     }
 
@@ -78,7 +79,7 @@ class CharacterDataParser
     private static function addFamily(stdClass $characterData, array $characters): void
     {
         if (!empty($characterData->Children)) {
-            self::addChildren(CharacterFinder::findCharacter($characterData->FirstName, $characters), $characterData, $characters);
+            self::addChildren(self::$characterFinder->find($characterData->FirstName), $characterData, $characters);
         }
     }
 
@@ -103,7 +104,10 @@ class CharacterDataParser
      */
     private static function addChild(Character $character, string $childName, array $characters): void
     {
-        $child = CharacterFinder::findCharacter($childName, $characters);
+        $name1 = $childName;
+        $child = current(array_filter($characters, function (Character $character) use ($name1) {
+            return $character->firstName === $name1;
+        }));
         if ($child != null)
             $character->addChild($child);
     }
