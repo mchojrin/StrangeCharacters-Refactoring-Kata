@@ -9,50 +9,43 @@ use StrangeCharacters\CharacterDataParser;
 class CharacterDataParserTest extends TestCase
 {
     #[Test]
-    public function non_static() {
+    public function findCharacterByPath() {
         $parser = new CharacterDataParser();
         self::assertEquals("Eleven", $parser->findByPath("/Jim/Eleven")->firstName);
     }
 
     #[Test]
-    public function findCharacterByPath(): void
-    {
-        CharacterDataParser::initWithDataFrom(null);
-        self::assertEquals("Eleven", CharacterDataParser::findCharacterBy("/Jim/Eleven")->firstName);
-    }
-
-    #[Test]
     public function findCharacterByEmptyPath(): void
     {
-        CharacterDataParser::initWithDataFrom(null);
-        self::assertNull(CharacterDataParser::findCharacterBy(""));
+        $parser = new CharacterDataParser();
+        self::assertNull($parser->findByPath(""));
     }
 
     #[Test]
     public function FindCharacterByPathWithFamilyName(): void
     {
-        CharacterDataParser::initWithDataFrom(null);
-        self::assertEquals("Nancy", CharacterDataParser::findCharacterBy("/Wheeler:Karen/Wheeler:Nancy")->firstName);
+        $parser = new CharacterDataParser();
+        self::assertEquals("Nancy", $parser->findByPath("/Wheeler:Karen/Wheeler:Nancy")->firstName);
     }
 
     #[Test]
     public function FindNemesisByPath(): void
     {
-        CharacterDataParser::initWithDataFrom(null);
-        self::assertEquals("Mindflayer", CharacterDataParser::findCharacterBy("/Joyce/Will{Nemesis}")->firstName);
+        $parser = new CharacterDataParser();
+        self::assertEquals("Mindflayer", $parser->findByPath("/Joyce/Will{Nemesis}")->firstName);
     }
 
     #[Test]
     public function FindNemesisByPathAndFamilyName(): void
     {
-        CharacterDataParser::initWithDataFrom(null);
-        self::assertNull(CharacterDataParser::findCharacterBy("/Wheeler:Karen/Wheeler:Nancy{Nemesis}"));
+        $parser = new CharacterDataParser();
+        self::assertNull($parser->findByPath("/Wheeler:Karen/Wheeler:Nancy{Nemesis}"));
     }
 
     #[Test]
     public function FindNothingByPathAndFamilyName(): void
     {
-        CharacterDataParser::initWithDataFrom(null);
-        self::assertNull(CharacterDataParser::findCharacterBy("/Wheeler:Karen/Wheeler:George"));
+        $parser = new CharacterDataParser();
+        self::assertNull($parser->findByPath("/Wheeler:Karen/Wheeler:George"));
     }
 }
