@@ -27,13 +27,13 @@ class CharacterDataParser
 
     private function buildFrom(array $data): array
     {
-        return self::buildCharactersFrom($data);
+        return $this->buildCharactersFrom($data);
     }
     /**
      * @param array $data
      * @return array
      */
-    private static function buildCharactersFrom(array $data): array
+    private function buildCharactersFrom(array $data): array
     {
         return array_map(fn(stdClass $characterData) => Character::withFirstAndLastNameAndMonsterStatus($characterData->FirstName, $characterData->LastName, $characterData->IsMonster), $data);
     }
@@ -90,13 +90,13 @@ class CharacterDataParser
 
     private function readFrom(string $filename): array
     {
-        return self::readCharactersDataFrom($filename);
+        return $this->readCharactersDataFrom($filename);
     }
     /**
      * @param string $filename
      * @return array
      */
-    private static function readCharactersDataFrom(string $filename): array
+    private function readCharactersDataFrom(string $filename): array
     {
         return json_decode(file_get_contents($filename), false);
     }
