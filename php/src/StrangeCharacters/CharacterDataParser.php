@@ -41,25 +41,7 @@ class CharacterDataParser
             $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
         }
 
-        if ($hasFamilyName) {
-            $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
-            if (!empty($familyMembers)) {
-                $personsWithoutCurlyBraces = self::getPersonsIn($tempPathWithoutModifier);
-                if (count($personsWithoutCurlyBraces) == 2) {
-                    $relativesNamedFirstName = self::findRelativesNamed(next($personsWithoutCurlyBraces), $familyMembers);
-                    $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
-                }
-            }
-        } else {
-            $character = self::$characterFinder->findByFirstName($characterName);
-        }
-
-        if (!empty($character) ) {
-
-            return $modifier == "Nemesis" ? $character->getNemesis() : $character;
-        }
-
-        return null;
+        return self::probablyFindCharacterNemesisAndStuff($hasFamilyName, $familyName ?? "", $tempPathWithoutModifier, $characterName, $modifier);
     }
 
     private static function createCompleteCharactersFrom(array $allCharactersData): array
@@ -249,5 +231,36 @@ class CharacterDataParser
                 self::separatePersonsByPath($path)
             )
         );
+    }
+
+    /**
+     * @param bool $hasFamilyName
+     * @param mixed $familyName
+     * @param string $tempPathWithoutModifier
+     * @param string $characterName
+     * @param string $modifier
+     * @return mixed|Character|null
+     */
+    protected static function probablyFindCharacterNemesisAndStuff(bool $hasFamilyName, mixed $familyName, string $tempPathWithoutModifier, string $characterName, string $modifier): mixed
+    {
+        if ($hasFamilyName) {
+            $familyMembers = self::$characterFinder->findFamilyByLastName($familyName);
+            if (!empty($familyMembers)) {
+                $personsWithoutCurlyBraces = self::getPersonsIn($tempPathWithoutModifier);
+                if (count($personsWithoutCurlyBraces) == 2) {
+                    $relativesNamedFirstName = self::findRelativesNamed(next($personsWithoutCurlyBraces), $familyMembers);
+                    $character = !empty($relativesNamedFirstName) ? current($relativesNamedFirstName) : null;
+                }
+            }
+        } else {
+            $character = self::$characterFinder->findByFirstName($characterName);
+        }
+
+        if (!empty($character)) {
+
+            return $modifier == "Nemesis" ? $character->getNemesis() : $character;
+        }
+
+        return null;
     }
 }
