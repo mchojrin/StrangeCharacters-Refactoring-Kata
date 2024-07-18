@@ -18,6 +18,13 @@ readonly class CharacterFinder
     {
     }
 
+    public function find(string $characterName): ?Character
+    {
+        $found = array_filter($this->allCharacters, fn(Character $c) => $c->firstName == $characterName);
+
+        return !empty($found) ? current($found) : null;
+    }
+
     public function findByPath(string $path): ?Character
     {
         return $this->findCharacterOrRelated($this->buildSearchCriteriaFrom($path));
