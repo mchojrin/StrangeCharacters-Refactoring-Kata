@@ -11,11 +11,16 @@ class CharacterDataParser
     const string PATH_SEPARATOR = "/";
     const string NAME_TYPE_SEPARATOR = ":";
     const string CURLY_BRACES_PATTERN = "|(.*)\{([^{]*)}|";
+    const string DEFAULT_INPUT_FILENAME = ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json";
     private static CharacterFinder $characterFinder;
 
     public static function initWithDataFrom(?string $filename): void
     {
-        self::$characterFinder = new CharacterFinder(self::createCompleteCharactersFrom(self::getAllCharactersDataFrom($filename ?? ROOT_DIR . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "strange_characters.json")));
+        self::$characterFinder = new CharacterFinder(
+            self::createCompleteCharactersFrom(
+                self::getAllCharactersDataFrom($filename ?? self::DEFAULT_INPUT_FILENAME)
+            )
+        );
     }
 
     public static function findCharacterByPath(string $path): ?Character
