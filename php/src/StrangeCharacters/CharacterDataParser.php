@@ -220,7 +220,7 @@ class CharacterDataParser
      */
     protected static function findCharacterOrRelated(CharacterSearchCriteria $criteria): ?Character
     {
-        if ($criteria->hasFamilyName) {
+        if (!empty($criteria->familyName)) {
             $familyMembers = self::$characterFinder->findFamilyByLastName($criteria->familyName);
             if (!empty($familyMembers)) {
                 $personsWithoutCurlyBraces = self::getPersonsIn($criteria->tempPathWithoutModifier);

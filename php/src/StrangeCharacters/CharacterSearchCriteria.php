@@ -6,8 +6,6 @@ namespace StrangeCharacters;
 
 readonly class CharacterSearchCriteria
 {
-    public bool $hasFamilyName;
-
     public function __construct(
         public string $characterName,
         public string $tempPathWithoutModifier,
@@ -15,6 +13,5 @@ readonly class CharacterSearchCriteria
         public ?string $familyName = "",
     )
     {
-        $this->hasFamilyName = !empty($this->familyName);
     }
 }
