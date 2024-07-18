@@ -34,18 +34,11 @@ class CharacterDataParser
         return $allCharacters;
     }
 
-    private static function findCharacter(string $name, array $characters): ?Character
-    {
-        return current(array_filter($characters, function (Character $character) use ($name) {
-            return $character->firstName === $name;
-        }));
-    }
-
     /**
      * @param array $data
      * @return array
      */
-    protected static function buildCharactersFrom(array $data): array
+    private static function buildCharactersFrom(array $data): array
     {
         return array_map(fn(stdClass $characterData) => Character::withFirstAndLastNameAndMonsterStatus($characterData->FirstName, $characterData->LastName, $characterData->IsMonster), $data);
     }
@@ -55,7 +48,7 @@ class CharacterDataParser
      * @param array $characters
      * @return void
      */
-    protected static function completeCharacter(stdClass $characterData, array $characters): void
+    private static function completeCharacter(stdClass $characterData, array $characters): void
     {
         self::addNemesis($characterData, $characters);
         self::addFamily($characterData, $characters);
@@ -66,11 +59,11 @@ class CharacterDataParser
      * @param array $characters
      * @return void
      */
-    protected static function addNemesis(stdClass $characterData, array $characters): void
+    private static function addNemesis(stdClass $characterData, array $characters): void
     {
         if (!empty($characterData->Nemesis)) {
-            $character = self::findCharacter($characterData->FirstName, $characters);
-            $character->setNemesis(self::findCharacter($characterData->Nemesis, $characters));
+            $character = CharacterFinder::findCharacter($characterData->FirstName, $characters);
+            $character->setNemesis(CharacterFinder::findCharacter($characterData->Nemesis, $characters));
         }
     }
 
@@ -79,10 +72,10 @@ class CharacterDataParser
      * @param array $characters
      * @return void
      */
-    protected static function addFamily(stdClass $characterData, array $characters): void
+    private static function addFamily(stdClass $characterData, array $characters): void
     {
         if (!empty($characterData->Children)) {
-            self::addChildren(self::findCharacter($characterData->FirstName, $characters), $characterData, $characters);
+            self::addChildren(CharacterFinder::findCharacter($characterData->FirstName, $characters), $characterData, $characters);
         }
     }
 
@@ -92,7 +85,7 @@ class CharacterDataParser
      * @param array $characters
      * @return void
      */
-    protected static function addChildren(Character $character, stdClass $characterData, array $characters): void
+    private static function addChildren(Character $character, stdClass $characterData, array $characters): void
     {
         foreach ($characterData->Children as $childName) {
             self::addChild($character, $childName, $characters);
@@ -105,9 +98,9 @@ class CharacterDataParser
      * @param array $characters
      * @return void
      */
-    protected static function addChild(Character $character, string $childName, array $characters): void
+    private static function addChild(Character $character, string $childName, array $characters): void
     {
-        $child = self::findCharacter($childName, $characters);
+        $child = CharacterFinder::findCharacter($childName, $characters);
         if ($child != null)
             $character->addChild($child);
     }
@@ -117,7 +110,7 @@ class CharacterDataParser
      * @param array $allCharacters
      * @return void
      */
-    protected static function completeCharacters(array $allCharactersData, array $allCharacters): void
+    private static function completeCharacters(array $allCharactersData, array $allCharacters): void
     {
         foreach ($allCharactersData as $characterData) {
             self::completeCharacter($characterData, $allCharacters);
@@ -128,7 +121,7 @@ class CharacterDataParser
      * @param string $filename
      * @return mixed
      */
-    protected static function getAllCharactersDataFrom(string $filename): mixed
+    private static function getAllCharactersDataFrom(string $filename): mixed
     {
         return json_decode(file_get_contents($filename), false);
     }
@@ -137,7 +130,7 @@ class CharacterDataParser
      * @param string $localName
      * @return string
      */
-    protected static function getRelationFrom(string $localName): string
+    private static function getRelationFrom(string $localName): string
     {
         $matches = [];
 
@@ -148,7 +141,7 @@ class CharacterDataParser
      * @param string $localName
      * @return string
      */
-    protected static function extractPureNameFrom(string $localName): string
+    private static function extractPureNameFrom(string $localName): string
     {
         return preg_replace("|\{[^{]*?}|", "", $localName);
     }
@@ -158,7 +151,7 @@ class CharacterDataParser
      * @param array $familyMembers
      * @return array
      */
-    protected static function findRelativesNamed(string $firstName, array $familyMembers): array
+    private static function findRelativesNamed(string $firstName, array $familyMembers): array
     {
         return array_filter($familyMembers, fn(Character $c) => ($c->firstName == $firstName));
     }
@@ -167,7 +160,7 @@ class CharacterDataParser
      * @param string $tempPathWithoutCurlyBraces
      * @return string[]
      */
-    protected static function separatePersonsByPath(string $tempPathWithoutCurlyBraces): array
+    private static function separatePersonsByPath(string $tempPathWithoutCurlyBraces): array
     {
         return explode(self::PATH_SEPARATOR, $tempPathWithoutCurlyBraces);
     }
@@ -176,7 +169,7 @@ class CharacterDataParser
      * @param string $names
      * @return string[]
      */
-    protected static function separateNamesByType(string $names): array
+    private static function separateNamesByType(string $names): array
     {
         return explode(self::NAME_TYPE_SEPARATOR, $names);
     }
@@ -185,7 +178,7 @@ class CharacterDataParser
      * @param string $path
      * @return string[]
      */
-    protected static function getPersonsIn(string $path): array
+    private static function getPersonsIn(string $path): array
     {
         return array_filter(self::separatePersonsByPath($path));
     }
@@ -194,7 +187,7 @@ class CharacterDataParser
      * @param string $names
      * @return array
      */
-    protected static function separateNames(string $names): array
+    private static function separateNames(string $names): array
     {
         $currentPersonNames = self::separateNamesByType($names);
 
@@ -205,7 +198,7 @@ class CharacterDataParser
      * @param string $path
      * @return array
      */
-    protected static function getPersonsFrom(string $path): array
+    private static function getPersonsFrom(string $path): array
     {
         return array_values(
             array_filter(
@@ -218,7 +211,7 @@ class CharacterDataParser
      * @param CharacterSearchCriteria $criteria
      * @return Character|null
      */
-    protected static function findCharacterOrRelated(CharacterSearchCriteria $criteria): ?Character
+    private static function findCharacterOrRelated(CharacterSearchCriteria $criteria): ?Character
     {
         $mainCharacter = self::findMainCharacter($criteria);
 
@@ -233,7 +226,7 @@ class CharacterDataParser
      * @param string $path
      * @return CharacterSearchCriteria
      */
-    protected static function buildSearchCriteriaFrom(string $path): CharacterSearchCriteria
+    private static function buildSearchCriteriaFrom(string $path): CharacterSearchCriteria
     {
         $characterName = "";
         $tempPathWithoutModifier = "";
@@ -257,10 +250,11 @@ class CharacterDataParser
      * @param CharacterSearchCriteria $criteria
      * @return Character|null
      */
-    protected static function findMainCharacter(CharacterSearchCriteria $criteria): ?Character
+    private static function findMainCharacter(CharacterSearchCriteria $criteria): ?Character
     {
         if (!empty($criteria->familyName)) {
-            return self::getFamilyMemberByName($criteria->familyName, $criteria->pathWithoutRelations);
+
+            return self::findFamilyMemberByName($criteria->familyName, $criteria->pathWithoutRelations);
         } else {
 
             return self::$characterFinder->findByFirstName($criteria->characterName);
@@ -268,10 +262,11 @@ class CharacterDataParser
     }
 
     /**
-     * @param CharacterSearchCriteria $criteria
-     * @return false|mixed|null
+     * @param string $lastName
+     * @param string $path
+     * @return Character|null
      */
-    protected static function getFamilyMemberByName(string $lastName, string $path): mixed
+    private static function findFamilyMemberByName(string $lastName, string $path): ?Character
     {
         $familyMembers = self::$characterFinder->findFamilyByLastName($lastName);
         if (!empty($familyMembers)) {

@@ -13,6 +13,13 @@ readonly class CharacterFinder
         $this->allCharacters = $allCharacters;
     }
 
+    public static function findCharacter(string $name, array $characters): ?Character
+    {
+        return current(array_filter($characters, function (Character $character) use ($name) {
+            return $character->firstName === $name;
+        }));
+    }
+
     public function findByFirstName(string $characterName): ?Character
     {
         $found = array_filter($this->allCharacters, fn(Character $c) => $c->firstName == $characterName);
