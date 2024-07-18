@@ -13,12 +13,12 @@ class CharacterDataParser
 
     private readonly CharacterFinder $finder;
 
-    public function __construct()
+    public function __construct(readonly ?string $filename = self::DEFAULT_INPUT_FILENAME)
     {
-        $charactersData = $this->readFrom($filename ?? self::DEFAULT_INPUT_FILENAME);
+        $charactersData = $this->readFrom($filename);
         $characters = $this->buildFrom($charactersData);
         $this->finder = new CharacterFinder($characters);
-        self::completeCharacters($charactersData, $characters);
+        $this->complete($charactersData, $characters);
     }
 
     public static function initWithDataFrom(?string $filename): void
@@ -27,6 +27,11 @@ class CharacterDataParser
         $characters = self::buildCharactersFrom($charactersData);
         self::$characterFinder = new CharacterFinder($characters);
         self::completeCharacters($charactersData, $characters);
+    }
+
+    public function findByPath(string $path): ?Character
+    {
+        return $this->finder->findByPath($path);
     }
 
     public static function findCharacterBy(string $path): ?Character
@@ -110,6 +115,10 @@ class CharacterDataParser
         }
     }
 
+    private function complete(array $allCharactersData, array $allCharacters): void
+    {
+        self::completeCharacters($allCharactersData, $allCharacters);
+    }
     /**
      * @param array $allCharactersData
      * @param array $allCharacters
