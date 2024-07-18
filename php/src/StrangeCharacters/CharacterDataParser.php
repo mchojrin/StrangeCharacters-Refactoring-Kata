@@ -137,7 +137,7 @@ class CharacterDataParser
      * @param string $localName
      * @return string
      */
-    protected static function getModifierFrom(string $localName): string
+    protected static function getRelationFrom(string $localName): string
     {
         $matches = [];
 
@@ -148,7 +148,7 @@ class CharacterDataParser
      * @param string $localName
      * @return string
      */
-    protected static function removeModifierFrom(string $localName): string
+    protected static function extractPureNameFrom(string $localName): string
     {
         return preg_replace("|\{[^{]*?}|", "", $localName);
     }
@@ -258,8 +258,8 @@ class CharacterDataParser
             $hasFamilyName = $hasFamilyName || !empty($familyName);
 
             if ($i == count($persons) - 1) {
-                $relation = self::getModifierFrom($firstName);
-                $characterName = self::removeModifierFrom($firstName);
+                $relation = self::getRelationFrom($firstName);
+                $characterName = self::extractPureNameFrom($firstName);
             }
 
             $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
