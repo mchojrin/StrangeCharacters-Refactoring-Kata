@@ -247,15 +247,12 @@ class CharacterDataParser
      */
     protected static function buildSearchCriteriaFrom(string $path): CharacterSearchCriteria
     {
-        $hasFamilyName = false;
         $characterName = "";
         $tempPathWithoutModifier = "";
         $persons = self::getPersonsFrom($path);
 
         for ($i = count($persons) - 1; $i >= 0; $i--) {
             [$familyName, $firstName] = self::separateNames($persons[$i]);
-
-            $hasFamilyName = $hasFamilyName || !empty($familyName);
 
             if ($i == count($persons) - 1) {
                 $relation = self::getRelationFrom($firstName);
@@ -265,8 +262,6 @@ class CharacterDataParser
             $tempPathWithoutModifier = self::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
         }
 
-        $searchCriteria = new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation, $familyName);
-
-        return $searchCriteria;
+        return new CharacterSearchCriteria($characterName, $tempPathWithoutModifier, $relation, $familyName);
     }
 }
