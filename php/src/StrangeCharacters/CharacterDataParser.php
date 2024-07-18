@@ -147,7 +147,7 @@ class CharacterDataParser
 
             if ($i == count($persons) - 1) {
                 $relation = self::$characterFinder->getRelationFrom($firstName);
-                $characterName = CharacterFinder::extractPureNameFrom($firstName);
+                $characterName = self::$characterFinder->extractPureNameFrom($firstName);
             }
 
             $tempPathWithoutModifier = CharacterFinder::PATH_SEPARATOR . $characterName . $tempPathWithoutModifier;
