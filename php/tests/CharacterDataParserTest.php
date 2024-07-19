@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use StrangeCharacters\CharacterDataParser;
@@ -10,43 +11,27 @@ class CharacterDataParserTest extends TestCase
 {
     private readonly CharacterDataParser $parser;
 
+    public static function expectationsProvider()
+    {
+        return [
+            ["/Jim/Eleven", "Eleven"],
+            ["/Wheeler:Karen/Wheeler:Nancy", "Nancy"],
+            ["/Joyce/Will{Nemesis}", "Mindflayer"],
+            ["/Wheeler:Karen/Wheeler:Nancy{Nemesis}", null],
+            ["/Wheeler:Karen/Wheeler:George", null],
+            ["", null],
+        ];
+    }
+
     protected function setUp(): void
     {
         $this->parser = new CharacterDataParser() ;
     }
 
     #[Test]
-    public function findCharacterByPath() {
-        self::assertEquals("Eleven", $this->parser->findByPath("/Jim/Eleven")->firstName);
-    }
-
-    #[Test]
-    public function findCharacterByEmptyPath(): void
+    #[DataProvider("expectationsProvider")]
+    public function shouldFindCharactersByPath(string $path, ?string $name): void
     {
-        self::assertNull($this->parser->findByPath(""));
-    }
-
-    #[Test]
-    public function FindCharacterByPathWithFamilyName(): void
-    {
-        self::assertEquals("Nancy", $this->parser->findByPath("/Wheeler:Karen/Wheeler:Nancy")->firstName);
-    }
-
-    #[Test]
-    public function FindNemesisByPath(): void
-    {
-        self::assertEquals("Mindflayer", $this->parser->findByPath("/Joyce/Will{Nemesis}")->firstName);
-    }
-
-    #[Test]
-    public function FindNemesisByPathAndFamilyName(): void
-    {
-        self::assertNull($this->parser->findByPath("/Wheeler:Karen/Wheeler:Nancy{Nemesis}"));
-    }
-
-    #[Test]
-    public function FindNothingByPathAndFamilyName(): void
-    {
-        self::assertNull($this->parser->findByPath("/Wheeler:Karen/Wheeler:George"));
+        self::assertEquals($name, $this->parser->findByPath($path)->firstName);
     }
 }
